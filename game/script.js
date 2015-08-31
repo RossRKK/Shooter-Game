@@ -16,10 +16,17 @@ var mouse = {
 	y: 0
 }
 
+var titleBar;
+var leftBar;
+var gameWin;
+var rightBar;
+var bottomBar;
+var player;
+
 function init() {
 	//adding graphical objects
 	//title bar rectangle
-	var titleBar = {
+	titleBar = {
 		type: "rect",
 		top: 0,
 		left: 0,
@@ -30,7 +37,7 @@ function init() {
 	graphObjs.push(titleBar);
 
 	//left side bar rectangle
-	var leftBar = {
+	leftBar = {
 		type: "rect",
 		top: titleBar.height,
 		left: 0,
@@ -41,7 +48,7 @@ function init() {
 	graphObjs.push(leftBar);
 
 	//game window
-	var gameWin = {
+	gameWin = {
 		type: "rect",
 		top: titleBar.height,
 		left: leftBar.width,
@@ -52,7 +59,7 @@ function init() {
 	graphObjs.push(gameWin);
 
 	//right side bar rectangle
-	var rightBar = {
+	rightBar = {
 		type: "rect",
 		top: titleBar.height,
 		left: gameWin.width + gameWin.left,
@@ -63,7 +70,7 @@ function init() {
 	graphObjs.push(rightBar);
 
 	//bottom bar rectangle
-	var bottomBar = {
+	bottomBar = {
 		type: "rect",
 		top: gameWin.height + gameWin.top,
 		left: leftBar.width,
@@ -74,7 +81,7 @@ function init() {
 	graphObjs.push(bottomBar);
 
 	//player icon
-	var player = {
+	player = {
 		type: "img",
 		top: gameWin.top + (gameWin.height/2) - 10,
 		left: gameWin.left + (gameWin.width/2) - 10,
@@ -92,30 +99,39 @@ function init() {
 		angle: Math.PI
 	}
 	graphObjs.push(player);
+
+	//mouse movement event listener
+	//sets mouse x and y coordinates
+	c.addEventListener('mousemove', function(e) {
+		mouse.x = getMousePos(e).x;
+		mouse.y = getMousePos(e).y;
+	});
+
+	//onclick event listener
+	//calls an elements clicked function
+	c.addEventListener('click', function(e) {
+		mouse.x = getMousePos(e).x;
+		mouse.y = getMousePos(e).y;
+		
+		//Collision detetction
+		clickObjs.forEach(function(element) {
+			if (mouse.y > element.top && y < element.top + element.height
+				&& mouse.x > element.left && x < element.left + element.width) {
+				//if element is clicked
+				element.clicked(element);
+			}
+		});
+	}, false);
 }
 
-//mouse movement event listener
-//sets mouse x and y coordinates
-c.addEventListener('mousemove', function(e) {
-	mouse.x = getMousePos(e).x;
-	mouse.y = getMousePos(e).y;
-});
-
-//onclick event listener
-//calls an elements clicked function
-c.addEventListener('click', function(e) {
-	mouse.x = getMousePos(e).x;
-	mouse.y = getMousePos(e).y;
-	
-	//Collision detetction
-	clickObjs.forEach(function(element) {
-		if (mouse.y > element.top && y < element.top + element.height
-			&& mouse.x > element.left && x < element.left + element.width) {
-			//if element is clicked
-			element.clicked(element);
-		}
-	});
-}, false);
+//function that calculates the mouses actual position on the canvas
+function getMousePos(e) {
+    var rect = c.getBoundingClientRect();
+    return {
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top
+    };
+}
 
 function render() {
 	//load next frame
@@ -133,7 +149,7 @@ function render() {
 				ctx.save();
 				ctx.translate(obj.left, obj.top);
 				ctx.rotate(obj.angle);
-				ctx.drawImage(obj.img, 0, 0, obj.width, obj.height);
+				ctx.drawImage(obj.img, -obj.width/2, -obj.height/2, obj.width, obj.height);
 				ctx.restore();
 			}
 		}
@@ -143,5 +159,8 @@ function render() {
 //the main game loop
 function gameLoop() {
 	window.requestAnimationFrame(gameLoop);
+
+	player.angle = -Math.atan2((player.left - player.width/2) - mouse.x, (player.top - player.height/2) - mouse.y);
+
 	render();
 }
