@@ -13,7 +13,8 @@ var graphObjs = [];
 function init() {
 	//adding graphical objects
 	//title bar rectangle
-	titleBar = {
+	var titleBar = {
+		type: "rect",
 		top: 0,
 		left: 0,
 		width: c.width,
@@ -23,7 +24,8 @@ function init() {
 	graphObjs.push(titleBar);
 
 	//left side bar rectangle
-	leftBar = {
+	var leftBar = {
+		type: "rect",
 		top: titleBar.height,
 		left: 0,
 		width: 180,
@@ -33,7 +35,8 @@ function init() {
 	graphObjs.push(leftBar);
 
 	//game window
-	gameWin = {
+	var gameWin = {
+		type: "rect",
 		top: titleBar.height,
 		left: leftBar.width,
 		width: c.width - 180 - leftBar.width,
@@ -43,7 +46,8 @@ function init() {
 	graphObjs.push(gameWin);
 
 	//right side bar rectangle
-	rightBar = {
+	var rightBar = {
+		type: "rect",
 		top: titleBar.height,
 		left: gameWin.width + gameWin.left,
 		width: c.width - (gameWin.width + gameWin.left),
@@ -53,7 +57,8 @@ function init() {
 	graphObjs.push(rightBar);
 
 	//bottom bar rectangle
-	bottomBar = {
+	var bottomBar = {
+		type: "rect",
 		top: gameWin.height + gameWin.top,
 		left: leftBar.width,
 		width: c.width - leftBar.width - rightBar.width,
@@ -61,19 +66,48 @@ function init() {
 		colour: "#242424"
 	};
 	graphObjs.push(bottomBar);
+
+	//player icon
+	var player = {
+		type: "img",
+		top: gameWin.top + (gameWin.height/2) - 10,
+		left: gameWin.left + (gameWin.width/2) - 10,
+		width: 20,
+		height: 20,
+		source: "player.png",
+		img: new Image(),
+		loaded: false,
+		load: function () {
+			player.img.src = player.source;
+			player.img.onload = function () {
+				player.loaded = true;
+			}
+		},
+		angle: Math.PI
+	}
+	graphObjs.push(player);
 }
 
 function render() {
 	//load next frame
 	//clear frame
 	ctx.clearRect(0,0, c.width, c.height);
-	ctx.fillStyle = "#373737";
-	ctx.fillRect(0, 0, c.width, c.height);
 
 	//draw each graphical object
 	graphObjs.forEach(function (obj) {
-		ctx.fillStyle = obj.colour;
-		ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
+		if (obj.type == "rect") {
+			ctx.fillStyle = obj.colour;
+			ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
+		} else if (obj.type == "img") {
+			obj.load();
+			if (obj.loaded) {
+				ctx.save();
+				ctx.translate(obj.left, obj.top);
+				ctx.rotate(obj.angle);
+				ctx.drawImage(obj.img, 0, 0, obj.width, obj.height);
+				ctx.restore();
+			}
+		}
 	});
 }
 
