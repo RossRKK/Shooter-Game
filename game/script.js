@@ -65,7 +65,7 @@ function init() {
 		height: c.height - titleBar.height - 120,
 		colour: "#F1F1F1"
 	};
-	graphObjs.push(gameWin);
+	graphObjs.unshift(gameWin);
 
 	//right side bar rectangle
 	rightBar = {
@@ -109,7 +109,7 @@ function init() {
 		vx: 0,
 		vy: 0
 	}
-	graphObjs.push(player);
+	graphObjs.splice(graphObjs.indexOf(gameWin + 1), 0, player);
 
 	//declaring the dimensions of the players hit box
 	hitbox = {
@@ -213,6 +213,17 @@ function gameLoop() {
 			player.vx = -0.5 * player.vx;
 		}
 	});
+
+	//resistance
+	player.vx = player.vx * 0.99;
+	player.vy = player.vy * 0.99;
+	if (player.vx < 0.001) {
+		player.vx = 0;
+	}
+	if (player.vy < 0.01) {
+		player.vy = 0;
+	}
+
 	//move collidable objects
 	collideObjs.forEach(function (obj) {
 		//move objects
