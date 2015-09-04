@@ -89,6 +89,18 @@ function init() {
 	};
 	graphObjs.push(bottomBar);
 
+	//declaration of collidable objects
+	test = {
+		type: "rect",
+		top: 300,
+		left: 300,
+		width: 20,
+		height: 20,
+		colour: "#555555"
+	}
+	graphObjs.push(test);
+	collideObjs.push(test);
+
 	//player icon
 	player = {
 		type: "img",
@@ -109,7 +121,7 @@ function init() {
 		vx: 0,
 		vy: 0
 	}
-	graphObjs.splice(graphObjs.indexOf(gameWin + 1), 0, player);
+	graphObjs.push(player);
 
 	//declaring the dimensions of the players hit box
 	hitbox = {
@@ -118,18 +130,6 @@ function init() {
 		bottom: player.top + player.height - 10,
 		right: player.left + player.width - 10,
 	}
-
-	//declaration of collidable objects
-	test = {
-		type: "rect",
-		top: 300,
-		left: 300,
-		width: 20,
-		height: 20,
-		colour: "#555555"
-	}
-	graphObjs.push(test);
-	collideObjs.push(test);
 
 	//mouse movement event listener
 	//sets mouse x and y coordinates
