@@ -7,21 +7,30 @@ $("#canvas").ready(function () {
 	gameLoop();
 });
 
+//various arrays of objects for gameplay
 var collideObjs = [];
 var graphObjs = [];
 var clickObjs = [];
 
+//object to track the mouse's position
 var mouse = {
 	x: 0,
 	y: 0
 }
 
+//declaration of graphical objects
 var titleBar;
 var leftBar;
 var gameWin;
 var rightBar;
 var bottomBar;
 var player;
+
+//the players hitbox
+var hitbox;
+
+//declaration of collidable objects
+var test;
 
 function init() {
 	//adding graphical objects
@@ -96,9 +105,31 @@ function init() {
 				player.loaded = true;
 			}
 		},
-		angle: Math.PI
+		angle: Math.PI,
+		vx: 0,
+		vy: 0
 	}
 	graphObjs.push(player);
+
+	//declaring the dimensions of the players hit box
+	hitbox = {
+		top: player.top - 5,
+		left: player.left - 5,
+		bottom: player.top + player.height - 10,
+		right: player.left + player.width - 10,
+	}
+
+	//declaration of collidable objects
+	test = {
+		type: "rect",
+		top: 300,
+		left: 300,
+		width: 20,
+		height: 20,
+		colour: "#555555"
+	}
+	graphObjs.push(test);
+	collideObjs.push(test);
 
 	//mouse movement event listener
 	//sets mouse x and y coordinates
@@ -141,26 +172,53 @@ function render() {
 	//draw each graphical object
 	graphObjs.forEach(function (obj) {
 		if (obj.type == "rect") {
+			//draw a rectangle with the correct colour and dimensions
 			ctx.fillStyle = obj.colour;
 			ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
 		} else if (obj.type == "img") {
 			obj.load();
 			if (obj.loaded) {
+				//save the unmidified canvas
 				ctx.save();
+				//translate the canvas to the objects position
 				ctx.translate(obj.left, obj.top);
+				//roatate the object at the correct angle
 				ctx.rotate(obj.angle);
-				ctx.drawImage(obj.img, -obj.width/2, -obj.height/2, obj.width, obj.height);
+				//draw the player icon
+				ctx.drawImage(obj.img, - obj.width/2, - obj.height/2, obj.width, obj.height);
+				//restore the canavs to its original state
 				ctx.restore();
 			}
 		}
 	});
 }
 
+function xor(foo, bar) {
+	return (foo && !bar) || (!foo && bar);
+}
+
 //the main game loop
 function gameLoop() {
 	window.requestAnimationFrame(gameLoop);
 
+	//calculate the angle that the player should face
 	player.angle = -Math.atan2((player.left - player.width/2) - mouse.x, (player.top - player.height/2) - mouse.y);
+
+	//collisions code
+	collideObjs.forEach(function (obj) {
+		var overLapX = !(obj.left + obj.width < hitbox.left) && !(obj.left > hitbox.right);
+		var overLapY = !(obj.top + obj.height < hitbox.top) && !(obj.top > hitbox.bottom);
+		if (overLapX && overLapY) {
+			player.vy = -0.5 * player.vy;
+			player.vx = -0.5 * player.vx;
+		}
+	});
+	//move collidable objects
+	collideObjs.forEach(function (obj) {
+		//move objects
+		obj.left += player.vx;
+		obj.top += player.vy;
+	});
 
 	render();
 }
