@@ -18,6 +18,12 @@ var mouse = {
 	y: 0
 }
 
+//which keys are pressed
+var w = false;
+var a = false;
+var s = false;
+var d = false;
+
 //declaration of graphical objects
 var titleBar;
 var leftBar;
@@ -28,6 +34,7 @@ var player;
 
 //the players hitbox
 var hitbox;
+var colliding = false;
 
 //declaration of collidable objects
 var test;
@@ -94,8 +101,8 @@ function init() {
 		type: "rect",
 		top: 300,
 		left: 300,
-		width: 20,
-		height: 20,
+		width: 40,
+		height: 40,
 		colour: "#555555"
 	}
 	graphObjs.push(test);
@@ -191,11 +198,44 @@ function render() {
 			}
 		}
 	});
+
+	//add key press event handlers
+	document.addEventListener("keydown", function () {
+		//get which key is being pressed
+		var keyPressed = String.fromCharCode(event.keyCode);
+
+		if (keyPressed == "W") {
+			w = true;
+		}
+		if (keyPressed == "A") {
+			a = true;
+		}
+		if (keyPressed == "S") {
+			s = true;
+		}
+		if (keyPressed == "D") {
+			d = true;
+		}
+	}, false);	
+	document.addEventListener("keyup", function () {
+		//get which key is being pressed
+		var keyPressed = String.fromCharCode(event.keyCode);
+
+		if (keyPressed == "W") {
+			w = false;
+		}
+		if (keyPressed == "A") {
+			a = false;
+		}
+		if (keyPressed == "S") {
+			s = false;
+		}
+		if (keyPressed == "D") {
+			d = false;
+		}
+	}, false);	
 }
 
-function xor(foo, bar) {
-	return (foo && !bar) || (!foo && bar);
-}
 
 //the main game loop
 function gameLoop() {
@@ -204,25 +244,58 @@ function gameLoop() {
 	//calculate the angle that the player should face
 	player.angle = -Math.atan2((player.left - player.width/2) - mouse.x, (player.top - player.height/2) - mouse.y);
 
+	//resistance
+	if (!colliding) {
+		player.vx = player.vx * 0.9;
+		player.vy = player.vy * 0.9;
+		if (player.vx < 0.1 && player.vx > -0.1) {
+			player.vx = 0;
+		}
+		if (player.vy < 0.1 && player.vy > -0.1) {
+			player.vy = 0;
+		}
+	}
+
+	//control inputs
+	if (w && !colliding) {
+		player.vy -= 0.2;
+	}
+	if (a && !colliding) {
+		player.vx -= 0.2;
+	}
+	if (s && !colliding) {
+		player.vy += 0.2;
+	}
+	if (d && !colliding) {
+		player.vx += 0.2;
+	}
+
+	//speed limiting
+	if (player.vy < -10) {
+		player.vy = -10;
+	}
+	if (player.vy > 10) {
+		player.vy = 10;
+	}
+	if (player.vx < -10) {
+		player.vx = -10;
+	}
+	if (player.vx > 10) {
+		player.vx = 10;
+	}
+
 	//collisions code
 	collideObjs.forEach(function (obj) {
-		var overLapX = !(obj.left + obj.width < hitbox.left) && !(obj.left > hitbox.right);
-		var overLapY = !(obj.top + obj.height < hitbox.top) && !(obj.top > hitbox.bottom);
-		if (overLapX && overLapY) {
+		var overLapX = !(obj.left + obj.width <= hitbox.left) && !(obj.left >= hitbox.right);
+		var overLapY = !(obj.top + obj.height <= hitbox.top) && !(obj.top >= hitbox.bottom);
+		if (overLapX && overLapY && !colliding) {
 			player.vy = -0.5 * player.vy;
 			player.vx = -0.5 * player.vx;
+			colliding = true;
+		} else {
+			colliding = false;
 		}
 	});
-
-	//resistance
-	player.vx = player.vx * 0.99;
-	player.vy = player.vy * 0.99;
-	if (player.vx < 0.001) {
-		player.vx = 0;
-	}
-	if (player.vy < 0.01) {
-		player.vy = 0;
-	}
 
 	//move collidable objects
 	collideObjs.forEach(function (obj) {
