@@ -38,6 +38,7 @@ var colliding = false;
 
 //declaration of collidable objects
 var test;
+var test2;
 
 function init() {
 	//adding graphical objects
@@ -102,11 +103,21 @@ function init() {
 		top: 300,
 		left: 300,
 		width: 40,
-		height: 40,
+		height: 200,
 		colour: "#555555"
 	}
-	graphObjs.push(test);
+	graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, test);
 	collideObjs.push(test);
+	test2 = {
+		type: "rect",
+		top: 0,
+		left: 300,
+		width: 40,
+		height: 200,
+		colour: "#555555"
+	}
+	graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, test2);
+	collideObjs.push(test2);
 
 	//player icon
 	player = {
@@ -257,17 +268,18 @@ function gameLoop() {
 	}
 
 	//control inputs
+	speed = 0.2
 	if (w && !colliding) {
-		player.vy -= 0.2;
+		player.vy += speed;
 	}
 	if (a && !colliding) {
-		player.vx -= 0.2;
+		player.vx += speed;
 	}
 	if (s && !colliding) {
-		player.vy += 0.2;
+		player.vy -= speed;
 	}
 	if (d && !colliding) {
-		player.vx += 0.2;
+		player.vx -= speed;
 	}
 
 	//speed limiting
@@ -289,8 +301,8 @@ function gameLoop() {
 		var overLapX = !(obj.left + obj.width <= hitbox.left) && !(obj.left >= hitbox.right);
 		var overLapY = !(obj.top + obj.height <= hitbox.top) && !(obj.top >= hitbox.bottom);
 		if (overLapX && overLapY && !colliding) {
-			player.vy = -0.5 * player.vy;
-			player.vx = -0.5 * player.vx;
+			player.vy = -player.vy;
+			player.vx = -player.vx;
 			colliding = true;
 		} else {
 			colliding = false;
