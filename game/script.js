@@ -34,7 +34,6 @@ var player;
 
 //the players hitbox
 var hitbox;
-var colliding = false;
 
 //declaration of collidable objects
 var test;
@@ -256,29 +255,27 @@ function gameLoop() {
 	player.angle = -Math.atan2((player.left - player.width/2) - mouse.x, (player.top - player.height/2) - mouse.y);
 
 	//resistance
-	if (!colliding) {
-		player.vx = player.vx * 0.9;
-		player.vy = player.vy * 0.9;
-		if (player.vx < 0.1 && player.vx > -0.1) {
-			player.vx = 0;
-		}
-		if (player.vy < 0.1 && player.vy > -0.1) {
-			player.vy = 0;
-		}
+	player.vx = player.vx * 0.9;
+	player.vy = player.vy * 0.9;
+	if (player.vx < 0.1 && player.vx > -0.1) {
+		player.vx = 0;
+	}
+	if (player.vy < 0.1 && player.vy > -0.1) {
+		player.vy = 0;
 	}
 
 	//control inputs
 	speed = 0.2
-	if (w && !colliding) {
+	if (w) {
 		player.vy += speed;
 	}
-	if (a && !colliding) {
+	if (a) {
 		player.vx += speed;
 	}
-	if (s && !colliding) {
+	if (s) {
 		player.vy -= speed;
 	}
-	if (d && !colliding) {
+	if (d) {
 		player.vx -= speed;
 	}
 
@@ -298,14 +295,9 @@ function gameLoop() {
 
 	//collisions code
 	collideObjs.forEach(function (obj) {
-		var overLapX = !(obj.left + obj.width <= hitbox.left) && !(obj.left >= hitbox.right);
-		var overLapY = !(obj.top + obj.height <= hitbox.top) && !(obj.top >= hitbox.bottom);
-		if (overLapX && overLapY && !colliding) {
+		if (obj.left + obj.width > hitbox.left && obj.left < hitbox.right && obj.top + obj.height > hitbox.top && obj.top < hitbox.bottom) {
 			player.vy = -player.vy;
 			player.vx = -player.vx;
-			colliding = true;
-		} else {
-			colliding = false;
 		}
 	});
 
