@@ -136,7 +136,8 @@ function init() {
 		},
 		angle: Math.PI,
 		vx: 0,
-		vy: 0
+		vy: 0,
+		speed: 0.2
 	}
 	graphObjs.push(player);
 
@@ -265,18 +266,17 @@ function gameLoop() {
 	}
 
 	//control inputs
-	speed = 0.2
 	if (w) {
-		player.vy += speed;
+		player.vy += player.speed;
 	}
 	if (a) {
-		player.vx += speed;
+		player.vx += player.speed;
 	}
 	if (s) {
-		player.vy -= speed;
+		player.vy -= player.speed;
 	}
 	if (d) {
-		player.vx -= speed;
+		player.vx -= player.speed;
 	}
 
 	//speed limiting
