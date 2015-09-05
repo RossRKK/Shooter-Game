@@ -137,7 +137,13 @@ function init() {
 		angle: Math.PI,
 		vx: 0,
 		vy: 0,
-		speed: 0.2
+		speed: 0.2,
+		fire: function () {
+			graphObj = {
+			}
+			collideObj = {
+			}
+		}
 	}
 	graphObjs.push(player);
 
@@ -162,14 +168,20 @@ function init() {
 		mouse.x = getMousePos(e).x;
 		mouse.y = getMousePos(e).y;
 		
+		clicked = false;
 		//Collision detetction
 		clickObjs.forEach(function(element) {
 			if (mouse.y > element.top && y < element.top + element.height
 				&& mouse.x > element.left && x < element.left + element.width) {
 				//if element is clicked
 				element.clicked(element);
+				clicked = true;
 			}
 		});
+		
+		if (!clicked) {
+			player.fire();
+		}
 	}, false);
 }
 
