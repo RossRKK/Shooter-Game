@@ -43,7 +43,7 @@ function init() {
 	//adding graphical objects
 	//title bar rectangle
 	titleBar = {
-		type: "rect",
+		type: "menu",
 		top: 0,
 		left: 0,
 		width: c.width,
@@ -54,7 +54,7 @@ function init() {
 
 	//left side bar rectangle
 	leftBar = {
-		type: "rect",
+		type: "menu",
 		top: titleBar.height,
 		left: 0,
 		width: 180,
@@ -65,7 +65,7 @@ function init() {
 
 	//game window
 	gameWin = {
-		type: "rect",
+		type: "menu",
 		top: titleBar.height,
 		left: leftBar.width,
 		width: c.width - 180 - leftBar.width,
@@ -76,7 +76,7 @@ function init() {
 
 	//right side bar rectangle
 	rightBar = {
-		type: "rect",
+		type: "menu",
 		top: titleBar.height,
 		left: gameWin.width + gameWin.left,
 		width: c.width - (gameWin.width + gameWin.left),
@@ -87,7 +87,7 @@ function init() {
 
 	//bottom bar rectangle
 	bottomBar = {
-		type: "rect",
+		type: "menu",
 		top: gameWin.height + gameWin.top,
 		left: leftBar.width,
 		width: c.width - leftBar.width - rightBar.width,
@@ -201,24 +201,33 @@ function render() {
 
 	//draw each graphical object
 	graphObjs.forEach(function (obj) {
-		if (obj.type == "rect") {
+		//ensure the object is within the game window
+		if (obj.top < gameWin.top + gameWin.height && obj.top + obj.height > gameWin.top &&
+			obj.left + obj.width > gameWin.left && obj.left < gameWin.left + gameWin.width) {
+			if (obj.type == "rect") {
+				//draw a rectangle with the correct colour and dimensions
+				ctx.fillStyle = obj.colour;
+				ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
+			} else if (obj.type == "img") {
+				obj.load();
+				if (obj.loaded) {
+					//save the unmidified canvas
+					ctx.save();
+					//translate the canvas to the objects position
+					ctx.translate(obj.left, obj.top);
+					//roatate the object at the correct angle
+					ctx.rotate(obj.angle);
+					//draw the player icon
+					ctx.drawImage(obj.img, - obj.width/2, - obj.height/2, obj.width, obj.height);
+					//restore the canavs to its original state
+					ctx.restore();
+				}
+			}
+		}
+		if (obj.type == "menu") {
 			//draw a rectangle with the correct colour and dimensions
 			ctx.fillStyle = obj.colour;
 			ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
-		} else if (obj.type == "img") {
-			obj.load();
-			if (obj.loaded) {
-				//save the unmidified canvas
-				ctx.save();
-				//translate the canvas to the objects position
-				ctx.translate(obj.left, obj.top);
-				//roatate the object at the correct angle
-				ctx.rotate(obj.angle);
-				//draw the player icon
-				ctx.drawImage(obj.img, - obj.width/2, - obj.height/2, obj.width, obj.height);
-				//restore the canavs to its original state
-				ctx.restore();
-			}
 		}
 	});
 
