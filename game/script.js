@@ -11,6 +11,7 @@ $("#canvas").ready(function () {
 var collideObjs = [];
 var graphObjs = [];
 var clickObjs = [];
+var bullets = [];
 
 //object to track the mouse's position
 var mouse = {
@@ -138,11 +139,18 @@ function init() {
 		vx: 0,
 		vy: 0,
 		speed: 0.2,
-		fire: function () {
-			graphObj = {
+		fire: function () {		
+			bullet = {
+				type: "bullet",
+				angle: player.angle,
+				dist: 10,
+				width: 5,
+				height: 10,
+				colour: "#555555",
+				x: 0,
+				y: 0
 			}
-			collideObj = {
-			}
+			bullets.push(bullet);
 		}
 	}
 	graphObjs.push(player);
@@ -222,6 +230,21 @@ function render() {
 					//restore the canavs to its original state
 					ctx.restore();
 				}
+			}
+			if (graphObjs.indexOf(obj) == graphObjs.indexOf(gameWin) + 1) {
+				bullets.forEach(function (obj) {
+					//save the unmidified canvas
+					ctx.save();
+					//translate the canvas to the objects position
+					ctx.translate(player.left, player.top);
+					//roatate the object at the correct angle
+					ctx.rotate(obj.angle);
+					//draw the bullet
+					ctx.fillStyle = obj.colour;
+					ctx.fillRect(- obj.width/2, - obj.height/2 - obj.dist, obj.width, obj.height);
+					//restore the canavs to its original state
+					ctx.restore();
+				});
 			}
 		}
 		if (obj.type == "menu") {
@@ -313,6 +336,22 @@ function gameLoop() {
 	if (player.vx > 10) {
 		player.vx = 10;
 	}
+
+	//move bullets
+	bulletSpeed = 5;
+	bullets.forEach(function (obj) {
+		obj.dist += bulletSpeed;
+
+		//calculate bullets x and y cooridnates
+		obj.x = (Math.sin(obj.angle) * obj.dist) + player.left;
+		obj.y = player.top - (Math.cos(obj.angle) * obj.dist);
+		//delete the bullet if it collides with something
+		collideObjs.forEach(function (i) {
+			if (obj.x > i.left && obj.x < i.left + i.width && obj.y > i.top && obj.y < i.top + i.height) {
+				bullets.splice(bullets.indexOf(obj), 1);
+			}
+		});
+	});
 
 	//collisions code
 	collideObjs.forEach(function (obj) {
