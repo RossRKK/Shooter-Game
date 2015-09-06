@@ -121,8 +121,8 @@ function init() {
 	//player icon
 	player = {
 		type: "img",
-		top: gameWin.top + (gameWin.height/2) - 10,
-		left: gameWin.left + (gameWin.width/2) - 10,
+		top: gameWin.top + (gameWin.height/2),
+		left: gameWin.left + (gameWin.width/2),
 		width: 20,
 		height: 20,
 		source: "player.png",
@@ -151,8 +151,8 @@ function init() {
 	hitbox = {
 		top: player.top - 5,
 		left: player.left - 5,
-		bottom: player.top + player.height - 10,
-		right: player.left + player.width - 10,
+		bottom: player.top + player.height - 15,
+		right: player.left + player.width - 15
 	}
 
 	//mouse movement event listener
