@@ -147,8 +147,11 @@ function init() {
 				width: 5,
 				height: 10,
 				colour: "#555555",
-				x: 0,
-				y: 0
+				x: player.left,
+				y: player.top,
+				orgX: player.left,
+				orgY: player.top,
+				speed: 5
 			}
 			bullets.push(bullet);
 		}
@@ -191,6 +194,43 @@ function init() {
 			player.fire();
 		}
 	}, false);
+
+
+	//add key press event handlers
+	document.addEventListener("keydown", function () {
+		//get which key is being pressed
+		var keyPressed = String.fromCharCode(event.keyCode);
+
+		if (keyPressed == "W") {
+			w = true;
+		}
+		if (keyPressed == "A") {
+			a = true;
+		}
+		if (keyPressed == "S") {
+			s = true;
+		}
+		if (keyPressed == "D") {
+			d = true;
+		}
+	}, false);	
+	document.addEventListener("keyup", function () {
+		//get which key is being pressed
+		var keyPressed = String.fromCharCode(event.keyCode);
+
+		if (keyPressed == "W") {
+			w = false;
+		}
+		if (keyPressed == "A") {
+			a = false;
+		}
+		if (keyPressed == "S") {
+			s = false;
+		}
+		if (keyPressed == "D") {
+			d = false;
+		}
+	}, false);	
 }
 
 //function that calculates the mouses actual position on the canvas
@@ -236,7 +276,7 @@ function render() {
 					//save the unmidified canvas
 					ctx.save();
 					//translate the canvas to the objects position
-					ctx.translate(player.left, player.top);
+					ctx.translate(obj.orgX, obj.orgY);
 					//roatate the object at the correct angle
 					ctx.rotate(obj.angle);
 					//draw the bullet
@@ -253,42 +293,6 @@ function render() {
 			ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
 		}
 	});
-
-	//add key press event handlers
-	document.addEventListener("keydown", function () {
-		//get which key is being pressed
-		var keyPressed = String.fromCharCode(event.keyCode);
-
-		if (keyPressed == "W") {
-			w = true;
-		}
-		if (keyPressed == "A") {
-			a = true;
-		}
-		if (keyPressed == "S") {
-			s = true;
-		}
-		if (keyPressed == "D") {
-			d = true;
-		}
-	}, false);	
-	document.addEventListener("keyup", function () {
-		//get which key is being pressed
-		var keyPressed = String.fromCharCode(event.keyCode);
-
-		if (keyPressed == "W") {
-			w = false;
-		}
-		if (keyPressed == "A") {
-			a = false;
-		}
-		if (keyPressed == "S") {
-			s = false;
-		}
-		if (keyPressed == "D") {
-			d = false;
-		}
-	}, false);	
 }
 
 
@@ -338,13 +342,16 @@ function gameLoop() {
 	}
 
 	//move bullets
-	bulletSpeed = 5;
 	bullets.forEach(function (obj) {
-		obj.dist += bulletSpeed;
+		obj.dist += obj.speed;
+
+		//move point of bullet origin when the player moves
+		obj.orgX += player.vx;
+		obj.orgY += player.vy;
 
 		//calculate bullets x and y cooridnates
-		obj.x = (Math.sin(obj.angle) * obj.dist) + player.left;
-		obj.y = player.top - (Math.cos(obj.angle) * obj.dist);
+		obj.x = (Math.sin(obj.angle) * obj.dist) + obj.orgX;
+		obj.y = obj.orgY - (Math.cos(obj.angle) * obj.dist);
 		//delete the bullet if it collides with something
 		collideObjs.forEach(function (i) {
 			if (obj.x > i.left && obj.x < i.left + i.width && obj.y > i.top && obj.y < i.top + i.height) {
