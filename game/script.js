@@ -66,7 +66,7 @@ function init() {
 
 	//game window
 	gameWin = {
-		type: "menu",
+		type: "rect", //not menu so that it is rendered before the bullets
 		top: titleBar.height,
 		left: leftBar.width,
 		width: c.width - 180 - leftBar.width,
@@ -139,7 +139,7 @@ function init() {
 		vx: 0,
 		vy: 0,
 		speed: 0.2,
-		fire: function () {		
+		fire: function () {
 			bullet = {
 				type: "bullet",
 				angle: player.angle,
@@ -201,16 +201,16 @@ function init() {
 		//get which key is being pressed
 		var keyPressed = String.fromCharCode(event.keyCode);
 
-		if (keyPressed == "W") {
+		if (keyPressed == "W" && !w) {
 			w = true;
 		}
-		if (keyPressed == "A") {
+		if (keyPressed == "A" && !a) {
 			a = true;
 		}
-		if (keyPressed == "S") {
+		if (keyPressed == "S" && !s) {
 			s = true;
 		}
-		if (keyPressed == "D") {
+		if (keyPressed == "D" && !d) {
 			d = true;
 		}
 	}, false);	
@@ -271,7 +271,7 @@ function render() {
 					ctx.restore();
 				}
 			}
-			if (graphObjs.indexOf(obj) == graphObjs.indexOf(gameWin) + 1) {
+			if (graphObjs.indexOf(obj) == graphObjs.indexOf(gameWin)) {
 				bullets.forEach(function (obj) {
 					//save the unmidified canvas
 					ctx.save();
