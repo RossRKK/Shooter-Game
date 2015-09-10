@@ -153,14 +153,16 @@ function init() {
 				orgY: player.top,
 				speed: 5
 			}
-			bullets.push(bullet);
-			player.ammo --;
+			if (player.ammo > 0) {
+				bullets.push(bullet);
+				player.ammo --;
+			}
 		},
 		ammo: 16,
 		health: 100,
 		charge: 100,
 		efficiency: 100,
-		weight: 20
+		weight: 100
 	}
 	graphObjs.push(player);
 
@@ -401,8 +403,15 @@ function render() {
 }
 
 function updateStats() {
+	//set efficiency based on health and weight
+	player.efficiency = player.health - (player.weight - 100);
+	//set speed based on efficiency
+	player.speed = player.efficiency/200;
+	//update the statis bars
 	healthBar.width = player.health * 2;
 	chargeBar.width = player.charge * 2;
+	efficiency.text = "Efficiency: " + player.efficiency + "%"
+	weight.text = "Weight: " + player.weight + "kg"
 }
 
 
@@ -424,17 +433,21 @@ function gameLoop() {
 	}
 
 	//control inputs
-	if (w) {
+	if (w && player.charge > 0) {
 		player.vy += player.speed;
 	}
-	if (a) {
+	if (a && player.charge > 0) {
 		player.vx += player.speed;
 	}
-	if (s) {
+	if (s && player.charge > 0) {
 		player.vy -= player.speed;
 	}
-	if (d) {
+	if (d && player.charge > 0) {
 		player.vx -= player.speed;
+	}
+	//drain charge if the player is moving
+	if((w || a || s || d) && player.charge > 0) {
+		player.charge -= 1/player.efficiency;
 	}
 
 	//speed limiting
