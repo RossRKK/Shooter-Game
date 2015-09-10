@@ -153,7 +153,7 @@ function init() {
 				orgY: player.top,
 				speed: 5
 			}
-			if (player.ammo > 0) {
+			if (player.ammo > 0) {;
 				bullets.push(bullet);
 				player.ammo --;
 			}
@@ -293,36 +293,30 @@ function init() {
 
 	//add key press event handlers
 	document.addEventListener("keydown", function () {
-		//get which key is being pressed
-		var keyPressed = String.fromCharCode(event.keyCode);
-
-		if (keyPressed == "W" && !w) {
+		if (event.keyCode == 87 && !w) {
 			w = true;
 		}
-		if (keyPressed == "A" && !a) {
+		if (event.keyCode == 65 && !a) {
 			a = true;
 		}
-		if (keyPressed == "S" && !s) {
+		if (event.keyCode == 83 && !s) {
 			s = true;
 		}
-		if (keyPressed == "D" && !d) {
+		if (event.keyCode == 68 && !d) {
 			d = true;
 		}
 	}, false);	
 	document.addEventListener("keyup", function () {
-		//get which key is being pressed
-		var keyPressed = String.fromCharCode(event.keyCode);
-
-		if (keyPressed == "W") {
+		if (event.keyCode == 87 && w) {
 			w = false;
 		}
-		if (keyPressed == "A") {
+		if (event.keyCode == 65 && a) {
 			a = false;
 		}
-		if (keyPressed == "S") {
+		if (event.keyCode == 83 && s) {
 			s = false;
 		}
-		if (keyPressed == "D") {
+		if (event.keyCode == 68 && d) {
 			d = false;
 		}
 	}, false);	
