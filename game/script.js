@@ -154,7 +154,13 @@ function init() {
 				speed: 5
 			}
 			bullets.push(bullet);
-		}
+			player.ammo --;
+		},
+		ammo: 16,
+		health: 100,
+		charge: 100,
+		efficiency: 100,
+		weight: 20
 	}
 	graphObjs.push(player);
 
@@ -165,6 +171,92 @@ function init() {
 		bottom: player.top + player.height - 15,
 		right: player.left + player.width - 15
 	}
+
+	//status bars
+	//health bar
+	healthBarBack = {
+		type: "stat",
+		colour: "#FFFFFF",
+		height: 40,
+		width: 200,
+		top: gameWin.height + gameWin.top + 20,
+		left: leftBar.left + leftBar.width + 100
+	}
+	graphObjs.push(healthBarBack);
+
+	healthBar = {
+		type: "stat",
+		colour: "#AA0000",
+		height: 40,
+		width: player.health * 2,
+		top: gameWin.height + gameWin.top + 20,
+		left: leftBar.left + leftBar.width + 100
+	}
+	graphObjs.push(healthBar);
+
+	healthLabel = {
+		type: "text",
+		font: "30px Arial",
+		colour: "#FFFFFF",
+		textAlign: "center",
+		text: "Health",
+		x: healthBar.left - 50,
+		y: healthBar.top + healthBar.height/2 + 10
+	}
+	graphObjs.push(healthLabel);
+
+	chargeBarBack = {
+		type: "stat",
+		colour: "#FFFFFF",
+		height: 40,
+		width: 200,
+		top: gameWin.height + gameWin.top + 20,
+		left: rightBar.left - 220
+	}
+	graphObjs.push(chargeBarBack);
+
+	chargeBar = {
+		type: "stat",
+		colour: "#FFFF00",
+		height: 40,
+		width: player.charge * 2,
+		top: gameWin.height + gameWin.top + 20,
+		left: rightBar.left - 220
+	}
+	graphObjs.push(chargeBar);
+
+	chargeLabel = {
+		type: "text",
+		font: "30px Arial",
+		colour: "#FFFFFF",
+		textAlign: "center",
+		text: "Charge",
+		x: chargeBar.left - 55,
+		y: chargeBar.top + chargeBar.height/2 + 10
+	}
+	graphObjs.push(chargeLabel);
+
+	weight = {
+		type: "text",
+		font: "30px Arial",
+		colour: "#FFFFFF",
+		textAlign: "center",
+		text: "Weight: " + player.weight + "kg",
+		x: healthBar.left + 50,
+		y: healthBar.top + healthBar.height + 40
+	}
+	graphObjs.push(weight);
+
+	efficiency = {
+		type: "text",
+		font: "30px Arial",
+		colour: "#FFFFFF",
+		textAlign: "center",
+		text: "Efficiency: " + player.efficiency + "%",
+		x: chargeBar.left + 50,
+		y: chargeBar.top + chargeBar.height + 40
+	}
+	graphObjs.push(efficiency);
 
 	//mouse movement event listener
 	//sets mouse x and y coordinates
@@ -194,6 +286,7 @@ function init() {
 			player.fire();
 		}
 	}, false);
+
 
 
 	//add key press event handlers
@@ -292,7 +385,24 @@ function render() {
 			ctx.fillStyle = obj.colour;
 			ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
 		}
+		if (obj.type == "stat") {
+			//draw a rectangle with the correct colour and dimensions
+			ctx.fillStyle = obj.colour;
+			ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
+		}
+		if (obj.type == "text") {
+			ctx.font = obj.font;
+			ctx.fillStyle = obj.colour;
+			ctx.textAlign = obj.textAlign;
+
+			ctx.fillText(obj.text, obj.x, obj.y);
+		}
 	});
+}
+
+function updateStats() {
+	healthBar.width = player.health * 2;
+	chargeBar.width = player.charge * 2;
 }
 
 
@@ -375,5 +485,6 @@ function gameLoop() {
 		obj.top += player.vy;
 	});
 
+	updateStats();
 	render();
 }
