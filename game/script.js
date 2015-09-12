@@ -262,14 +262,14 @@ function init() {
 
 	//mouse movement event listener
 	//sets mouse x and y coordinates
-	$("#canvas").mousemove(function (e) {
+	$(window).mousemove(function (e) {
 		mouse.x = getMousePos(e).x;
 		mouse.y = getMousePos(e).y;
 	});
 
 	//onclick event listener
 	//calls an elements clicked function
-	$("#canvas").click(function (e) {
+	$(window).click(function (e) {
 		mouse.x = getMousePos(e).x;
 		mouse.y = getMousePos(e).y;
 		
