@@ -262,14 +262,14 @@ function init() {
 
 	//mouse movement event listener
 	//sets mouse x and y coordinates
-	c.addEventListener('mousemove', function(e) {
+	$("#canvas").mousemove(function (e) {
 		mouse.x = getMousePos(e).x;
 		mouse.y = getMousePos(e).y;
 	});
 
 	//onclick event listener
 	//calls an elements clicked function
-	c.addEventListener('click', function(e) {
+	$("#canvas").click(function (e) {
 		mouse.x = getMousePos(e).x;
 		mouse.y = getMousePos(e).y;
 		
@@ -287,12 +287,9 @@ function init() {
 		if (!clicked) {
 			player.fire();
 		}
-	}, false);
+	});
 
-
-
-	//add key press event handlers
-	document.addEventListener("keydown", function () {
+	$(window).keydown(function (event) {
 		if (event.keyCode == 87 && !w) {
 			w = true;
 		}
@@ -305,8 +302,9 @@ function init() {
 		if (event.keyCode == 68 && !d) {
 			d = true;
 		}
-	}, false);	
-	document.addEventListener("keyup", function () {
+	});
+
+	$(window).keyup(function (event) {
 		if (event.keyCode == 87 && w) {
 			w = false;
 		}
@@ -319,7 +317,7 @@ function init() {
 		if (event.keyCode == 68 && d) {
 			d = false;
 		}
-	}, false);	
+	});
 }
 
 //function that calculates the mouses actual position on the canvas
@@ -412,7 +410,6 @@ function updateStats() {
 //the main game loop
 function gameLoop() {
 	window.requestAnimationFrame(gameLoop);
-
 	//calculate the angle that the player should face
 	player.angle = -Math.atan2((player.left - player.width/2) - mouse.x, (player.top - player.height/2) - mouse.y);
 
