@@ -263,6 +263,25 @@ function init() {
 	}
 	graphObjs.push(efficiency);
 
+	gunIcon = {
+		type: "img",
+		top: gameWin.top + gameWin.height + 40,
+		left: rightBar.left + rightBar.width/2,
+		width: 64,
+		height: 64,
+		source: "textures/guns/pistol.png",
+		img: new Image(),
+		loaded: false,
+		load: function () {
+			gunIcon.img.src = gunIcon.source;
+			gunIcon.img.onload = function () {
+				gunIcon.loaded = true;
+			}
+		},
+		angle: 0
+	}
+	graphObjs.push(gunIcon);
+
 	//mouse movement event listener
 	//sets mouse x and y coordinates
 	$(window).mousemove(function (e) {
@@ -340,8 +359,8 @@ function render() {
 	//draw each graphical object
 	graphObjs.forEach(function (obj) {
 		//ensure the object is within the game window
-		if (obj.top < gameWin.top + gameWin.height && obj.top + obj.height > gameWin.top &&
-			obj.left + obj.width > gameWin.left && obj.left < gameWin.left + gameWin.width) {
+		if (obj.top < c.height && obj.top + obj.height > 0 &&
+			obj.left + obj.width > 0 && obj.left < c.width) {
 			if (obj.type == "rect") {
 				//draw a rectangle with the correct colour and dimensions
 				ctx.fillStyle = obj.colour;
