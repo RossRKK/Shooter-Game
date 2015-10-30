@@ -98,7 +98,7 @@ function init() {
 	graphObjs.push(bottomBar);
 
 	//declaration of collidable objects
-	test = {
+	/*test = {
 		type: "rect",
 		top: 300,
 		left: 300,
@@ -117,7 +117,14 @@ function init() {
 		colour: "#555555"
 	}
 	graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, test2);
-	collideObjs.push(test2);
+	collideObjs.push(test2);*/
+	//load level json
+	$.getJSON('levels/level.json', function (response) {
+		JSON = response;
+		JSON.collideObjs.forEach(function (obj) {
+			collideObjs.push(obj);
+		})
+	});
 
 	//player icon
 	player = {
