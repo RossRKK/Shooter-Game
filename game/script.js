@@ -161,6 +161,7 @@ function init() {
 			}
 		},
 		ammo: 16,
+		maxAmmo: 16,
 		health: 100,
 		charge: 100,
 		efficiency: 100,
@@ -394,6 +395,20 @@ function render() {
 			ctx.fillText(obj.text, obj.x, obj.y);
 		}
 	});
+
+	//draw ammo bar
+	tHeight = gameWin.height - 80;
+	width = 40;
+	height = tHeight/((player.maxAmmo * 2) - 1);
+	for (var i = 0; i < player.maxAmmo * 2; i = i + 2) {
+		ctx.fillStyle = "#666666";
+		ctx.fillRect(rightBar.left + rightBar.width/2 - width/2, gameWin.top + 40 + height * i, width, height);
+	}
+
+	for (var i = 1; i < player.ammo * 2; i = i + 2) {
+		ctx.fillStyle = "#FFFFFF";
+		ctx.fillRect(rightBar.left + rightBar.width/2 - width/2, gameWin.top + gameWin.height - 40 - (height * i), width, height);
+	}
 }
 
 function updateStats() {
