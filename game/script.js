@@ -50,7 +50,7 @@ function init() {
 		left: 0,
 		width: c.width,
 		height: 60,
-		colour: "#000000"
+		colour: "#527A7A"
 	};
 	graphObjs.push(titleBar);
 
@@ -61,7 +61,7 @@ function init() {
 		left: 0,
 		width: 180,
 		height: c.height - titleBar.height,
-		colour: "#545454"
+		colour: "#AEAEAE"
 	};
 	graphObjs.push(leftBar);
 
@@ -83,7 +83,7 @@ function init() {
 		left: gameWin.width + gameWin.left,
 		width: c.width - (gameWin.width + gameWin.left),
 		height: c.height - titleBar.height,
-		colour: "#545454"
+		colour: "#AEAEAE"
 	};
 	graphObjs.push(rightBar);
 
@@ -94,7 +94,7 @@ function init() {
 		left: leftBar.width,
 		width: c.width - leftBar.width - rightBar.width,
 		height: c.height - (gameWin.height + gameWin.top),
-		colour: "#242424"
+		colour: "#55807B"
 	};
 	graphObjs.push(bottomBar);
 
@@ -111,7 +111,7 @@ function init() {
 
 		title = {
 			type: "text",
-			font: "30px Arial",
+			font: "30px Palatino Linotype",
 			colour: "#FFFFFF",
 			textAlign: "center",
 			text: level.title,
@@ -181,7 +181,7 @@ function init() {
 	//health bar
 	healthBarBack = {
 		type: "stat",
-		colour: "#FFFFFF",
+		colour: "#B80000",
 		height: 40,
 		width: 200,
 		top: gameWin.height + gameWin.top + 20,
@@ -191,7 +191,7 @@ function init() {
 
 	healthBar = {
 		type: "stat",
-		colour: "#AA0000",
+		colour: "#900000",
 		height: 40,
 		width: player.health * 2,
 		top: gameWin.height + gameWin.top + 20,
@@ -201,7 +201,7 @@ function init() {
 
 	healthLabel = {
 		type: "text",
-		font: "30px Arial",
+		font: "30px Palatino Linotype",
 		colour: "#FFFFFF",
 		textAlign: "center",
 		text: "Health",
@@ -212,7 +212,7 @@ function init() {
 
 	chargeBarBack = {
 		type: "stat",
-		colour: "#FFFFFF",
+		colour: "#FFE680",
 		height: 40,
 		width: 200,
 		top: gameWin.height + gameWin.top + 20,
@@ -222,7 +222,7 @@ function init() {
 
 	chargeBar = {
 		type: "stat",
-		colour: "#FFFF00",
+		colour: "#FFCC00",
 		height: 40,
 		width: player.charge * 2,
 		top: gameWin.height + gameWin.top + 20,
@@ -232,7 +232,7 @@ function init() {
 
 	chargeLabel = {
 		type: "text",
-		font: "30px Arial",
+		font: "30px Palatino Linotype",
 		colour: "#FFFFFF",
 		textAlign: "center",
 		text: "Charge",
@@ -243,7 +243,7 @@ function init() {
 
 	weight = {
 		type: "text",
-		font: "30px Arial",
+		font: "30px Palatino Linotype",
 		colour: "#FFFFFF",
 		textAlign: "center",
 		text: "Weight: " + player.weight + "kg",
@@ -254,7 +254,7 @@ function init() {
 
 	efficiency = {
 		type: "text",
-		font: "30px Arial",
+		font: "30px Palatino Linotype",
 		colour: "#FFFFFF",
 		textAlign: "center",
 		text: "Efficiency: " + player.efficiency + "%",
@@ -420,12 +420,12 @@ function render() {
 	width = 40;
 	height = tHeight/((player.maxAmmo * 2) - 1);
 	for (var i = 0; i < player.maxAmmo * 2; i = i + 2) {
-		ctx.fillStyle = "#666666";
+		ctx.fillStyle = "#939393";
 		ctx.fillRect(rightBar.left + rightBar.width/2 - width/2, gameWin.top + 40 + height * i, width, height);
 	}
 
 	for (var i = 1; i < player.ammo * 2; i = i + 2) {
-		ctx.fillStyle = "#FFFFFF";
+		ctx.fillStyle = "#F5F5F5";
 		ctx.fillRect(rightBar.left + rightBar.width/2 - width/2, gameWin.top + gameWin.height - 40 - (height * i), width, height);
 	}
 }
