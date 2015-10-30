@@ -72,7 +72,7 @@ function init() {
 		left: leftBar.width,
 		width: c.width - 180 - leftBar.width,
 		height: c.height - titleBar.height - 120,
-		colour: "#F1F1F1"
+		colour: "#F5F5F5"
 	};
 	graphObjs.unshift(gameWin);
 
