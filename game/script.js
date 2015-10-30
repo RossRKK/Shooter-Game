@@ -12,6 +12,7 @@ var collideObjs = [];
 var graphObjs = [];
 var clickObjs = [];
 var bullets = [];
+var level = {};
 
 //object to track the mouse's position
 var mouse = {
@@ -97,36 +98,27 @@ function init() {
 	};
 	graphObjs.push(bottomBar);
 
-	//declaration of collidable objects
-	/*test = {
-		type: "rect",
-		top: 300,
-		left: 300,
-		width: 40,
-		height: 200,
-		colour: "#555555"
-	}
-	graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, test);
-	collideObjs.push(test);
-	test2 = {
-		type: "rect",
-		top: 0,
-		left: 300,
-		width: 40,
-		height: 200,
-		colour: "#555555"
-	}
-	graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, test2);
-	collideObjs.push(test2);*/
 	//load level json
 	$.getJSON('levels/level.json', function (response) {
-		JSON = response;
+		level = response;
 		//add collideObjs
-		collideObjs = JSON.collideObjs;
+		collideObjs = level.collideObjs;
 		//add collideobjs to graphobjs array
-		JSON.collideObjs.forEach(function (obj){
+		level.collideObjs.forEach(function (obj){
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
 		});
+
+
+		title = {
+			type: "text",
+			font: "30px Arial",
+			colour: "#FFFFFF",
+			textAlign: "center",
+			text: level.title,
+			x: titleBar.left + titleBar.width/2,
+			y: titleBar.top + titleBar.height/2 + 10
+		}
+		graphObjs.push(title);
 	});
 
 	//player icon
