@@ -121,9 +121,12 @@ function init() {
 	//load level json
 	$.getJSON('levels/level.json', function (response) {
 		JSON = response;
-		JSON.collideObjs.forEach(function (obj) {
-			collideObjs.push(obj);
-		})
+		//add collideObjs
+		collideObjs = JSON.collideObjs;
+		//add collideobjs to graphobjs array
+		JSON.collideObjs.forEach(function (obj){
+			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
+		});
 	});
 
 	//player icon
