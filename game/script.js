@@ -291,7 +291,7 @@ function init() {
 
 	//onclick event listener
 	//calls an elements clicked function
-	$(window).click(function (e) {
+	$("canvas").click(function (e) {
 		mouse.x = getMousePos(e).x;
 		mouse.y = getMousePos(e).y;
 		
