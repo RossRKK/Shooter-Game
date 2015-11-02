@@ -42,6 +42,13 @@ var hitbox;
 var test;
 var test2;
 
+function loadImg(obj) {
+	obj.img.src = obj.source;
+	obj.img.onload = function () {
+		obj.loaded = true;
+	}
+}
+
 function init() {
 	//adding graphical objects
 	//title bar rectangle
@@ -106,6 +113,13 @@ function init() {
 		collideObjs = level.collideObjs;
 		//add collideobjs to graphobjs array
 		level.collideObjs.forEach(function (obj){
+			if (obj.type == "img") {
+				obj.img = new Image();
+				obj.img.src = obj.source;
+				obj.img.onload = function () {
+					obj.loaded = true;
+				}
+			}
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
 		});
 
@@ -117,6 +131,16 @@ function init() {
 		//add enemeies to the graphobjs array
 		level.enemies.forEach(function (obj){
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
+		});
+
+		enemies.forEach(function (obj) {
+			if (obj.type == "img") {
+				obj.img = new Image();
+				obj.img.src = obj.source;
+				obj.img.onload = function () {
+					obj.loaded = true;
+				}
+			}
 		});
 
 
@@ -377,7 +401,9 @@ function render() {
 				ctx.fillStyle = obj.colour;
 				ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
 			} else if (obj.type == "img") {
-				obj.load();
+				if (!obj.loaded) {
+					obj.load();
+				}
 				if (obj.loaded) {
 					//save the unmidified canvas
 					ctx.save();
@@ -551,6 +577,7 @@ function gameLoop() {
 					if(obj.pType == "loop") {
 						obj.curWay = (obj.curWay + 1) % obj.pWays.length;
 					}
+					obj.angle = -Math.atan2((obj.left - obj.width/2) - obj.pWays[obj.curWay].x, (obj.top - obj.height/2) - obj.pWays[obj.curWay].y);
 				}
 			}
 		}
