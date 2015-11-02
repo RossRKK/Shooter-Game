@@ -4,5 +4,5 @@
 		{"type": "rect", "top": 300, "left": 300, "width": 40, "height": 200, "colour": "#787878"},
 		{"type": "rect", "top": 0, "left": 300, "width": 40, "height": 200, "colour": "#787878"}],
 	"enemies": [
-		{"type": "img", "top": 242, "left": 300, "width": 20, "height": 20, "colour": "#FF0000", "pType": "loop", "pWays": [{"x": 280, "y": 242}, {"x": 280, "y": -20}, {"x": 360, "y": -20}, {"x": 360, "y": 242}], "curWay": 0, "speed": 3, "source": "player.png", "img": null, "loaded": false, "angle": 0}]
+		{"type": "img", "top": 242, "left": 300, "width": 20, "height": 20, "colour": "#FF0000", "pType": "loop", "pWays": [{"x": 280, "y": 242}, {"x": 280, "y": -20}, {"x": 360, "y": -20}, {"x": 360, "y": 242}], "curWay": 0, "speed": 3, "patroling": true, "source": "player.png", "img": null, "loaded": false, "angle": 0}]
 }

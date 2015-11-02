@@ -560,26 +560,52 @@ function gameLoop() {
 		if (obj.pType != null) {
 			//do this as many times as the objects speed is
 			for (var i = 0; i < obj.speed; i++) {
-				//move the object towards the waypoint
-				if (obj.left + obj.width/2 < obj.pWays[obj.curWay].x) {
-					obj.left ++;
-				} else if (obj.left + obj.width/2 > obj.pWays[obj.curWay].x) {
-					obj.left --;
-				}
-				if (obj.top + obj.height/2 < obj.pWays[obj.curWay].y) {
-					obj.top ++;
-				} else if (obj.top + obj.height/2 > obj.pWays[obj.curWay].y) {
-					obj.top --;
-				}
-				//if the object has reached its way point
-				if (Math.round(obj.left + obj.width/2) == Math.round(obj.pWays[obj.curWay].x) && Math.round(obj.top + obj.height/2) == Math.round(obj.pWays[obj.curWay].y)) {
-					//if the patrol type is loop change to correct waypoint
-					if(obj.pType == "loop") {
-						obj.curWay = (obj.curWay + 1) % obj.pWays.length;
+				if (obj.patroling) {
+					//move the object towards the waypoint
+					if (obj.left + obj.width/2 < obj.pWays[obj.curWay].x) {
+						obj.left ++;
+					} else if (obj.left + obj.width/2 > obj.pWays[obj.curWay].x) {
+						obj.left --;
 					}
-					obj.angle = -Math.atan2((obj.left - obj.width/2) - obj.pWays[obj.curWay].x, (obj.top - obj.height/2) - obj.pWays[obj.curWay].y);
+					if (obj.top + obj.height/2 < obj.pWays[obj.curWay].y) {
+						obj.top ++;
+					} else if (obj.top + obj.height/2 > obj.pWays[obj.curWay].y) {
+						obj.top --;
+					}
+					//if the object has reached its way point
+					if (Math.round(obj.left + obj.width/2) == Math.round(obj.pWays[obj.curWay].x) && Math.round(obj.top + obj.height/2) == Math.round(obj.pWays[obj.curWay].y)) {
+						//if the patrol type is loop change to correct waypoint
+						if(obj.pType == "loop") {
+							obj.curWay = (obj.curWay + 1) % obj.pWays.length;
+						}
+						//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
+						obj.angle = -Math.atan2((obj.left - obj.width/2) - obj.pWays[obj.curWay].x, (obj.top - obj.height/2) - obj.pWays[obj.curWay].y);
+					}
+				} else {
+					//move the enemy towards the player if the enemey is further than 50px away
+					if ((Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2)) > 50)) {
+						if (obj.left + obj.width/2 < player.left + player.width/2) {
+							obj.left ++;
+						} else if (obj.left + obj.width/2 > player.left + player.width/2) {
+							obj.left --;
+						}
+						if (obj.top + obj.height/2 < player.top + player.height/2) {
+							obj.top ++;
+						} else if (obj.top + obj.height/2 > player.top + player.height/2) {
+							obj.top --;
+						}
+					}
+					//set enemy angle towards player
+					obj.angle = -Math.atan2((obj.left - obj.width/2) - player.left + player.width/2, (obj.top - obj.height/2) - player.top + player.height/2);
 				}
 			}
+		}
+
+		//if the player is within the enemies view
+		if (Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2)) < 200 && -Math.atan2((obj.left - obj.width/2) - player.left + player.width/2, (obj.top - obj.height/2) - player.top + player.height/2) - obj.angle < Math.PI/2) {
+			obj.patroling = false;
+		} else {
+			obj.patroling = true;
 		}
 	});
 
