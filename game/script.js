@@ -558,6 +558,10 @@ function gameLoop() {
 	//enemy patrols
 	enemies.forEach(function (obj) {
 		if (obj.pType != null) {
+			//calculate the distance from the enemy to the player
+			playerDist = Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2));
+			//calculate the angle from the enemy to the player
+			playerAngle = -Math.atan2((obj.left - obj.width/2) - player.left + player.width/2, (obj.top - obj.height/2) - player.top + player.height/2);
 			//do this as many times as the objects speed is
 			for (var i = 0; i < obj.speed; i++) {
 				if (obj.patroling) {
@@ -583,7 +587,7 @@ function gameLoop() {
 					}
 				} else {
 					//move the enemy towards the player if the enemey is further than 50px away
-					if ((Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2)) > 50)) {
+					if (playerDist > 75) {
 						if (obj.left + obj.width/2 < player.left + player.width/2) {
 							obj.left ++;
 						} else if (obj.left + obj.width/2 > player.left + player.width/2) {
@@ -596,14 +600,28 @@ function gameLoop() {
 						}
 					}
 					//set enemy angle towards player
-					obj.angle = -Math.atan2((obj.left - obj.width/2) - player.left + player.width/2, (obj.top - obj.height/2) - player.top + player.height/2);
+					obj.angle = playerAngle;
 				}
 			}
 		}
 
 		//if the player is within the enemies view
-		if (Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2)) < 200 && -Math.atan2((obj.left - obj.width/2) - player.left + player.width/2, (obj.top - obj.height/2) - player.top + player.height/2) - obj.angle < Math.PI/2) {
+		if (playerDist < obj.range && playerAngle - obj.angle < obj.rangeAng) {
 			obj.patroling = false;
+			bullet = {
+				type: "bullet",
+				angle: obj.angle,
+				dist: 10,
+				width: 5,
+				height: 10,
+				colour: "#555555",
+				x: obj.left,
+				y: obj.top,
+				orgX: obj.left,
+				orgY: obj.top,
+				speed: 5
+			}
+			//bullets.push(bullet);
 		} else {
 			obj.patroling = true;
 		}
