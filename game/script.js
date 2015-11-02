@@ -546,7 +546,7 @@ function gameLoop() {
 					obj.top --;
 				}
 				//if the object has reached its way point
-				if (obj.left + obj.width/2 == obj.pWays[obj.curWay].x && obj.top + obj.height/2 == obj.pWays[obj.curWay].y) {
+				if (Math.round(obj.left + obj.width/2) == Math.round(obj.pWays[obj.curWay].x) && Math.round(obj.top + obj.height/2) == Math.round(obj.pWays[obj.curWay].y)) {
 					//if the patrol type is loop change to correct waypoint
 					if(obj.pType == "loop") {
 						obj.curWay = (obj.curWay + 1) % obj.pWays.length;
