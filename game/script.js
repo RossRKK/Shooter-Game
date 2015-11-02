@@ -529,6 +529,33 @@ function gameLoop() {
 		}
 	});
 
+	//enemy patrols
+	enemies.forEach(function (obj) {
+		if (obj.pType != null) {
+			//do this as many times as the objects speed is
+			for (var i = 0; i < obj.speed; i++) {
+				//move the object towards the waypoint
+				if (obj.left + obj.width/2 < obj.pWays[obj.curWay].x) {
+					obj.left ++;
+				} else if (obj.left + obj.width/2 > obj.pWays[obj.curWay].x) {
+					obj.left --;
+				}
+				if (obj.top + obj.height/2 < obj.pWays[obj.curWay].y) {
+					obj.top ++;
+				} else if (obj.top + obj.height/2 > obj.pWays[obj.curWay].y) {
+					obj.top --;
+				}
+				//if the object has reached its way point
+				if (obj.left + obj.width/2 == obj.pWays[obj.curWay].x && obj.top + obj.height/2 == obj.pWays[obj.curWay].y) {
+					//if the patrol type is loop change to correct waypoint
+					if(obj.pType == "loop") {
+						obj.curWay = (obj.curWay + 1) % obj.pWays.length;
+					}
+				}
+			}
+		}
+	});
+
 	//move collidable objects
 	collideObjs.forEach(function (obj) {
 		//move objects

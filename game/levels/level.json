@@ -4,5 +4,5 @@
 		{"type": "rect", "top": 300, "left": 300, "width": 40, "height": 200, "colour": "#787878"},
 		{"type": "rect", "top": 0, "left": 300, "width": 40, "height": 200, "colour": "#787878"}],
 	"enemies": [
-		{"type": "rect", "top": 242, "left": 300, "width": 16, "height": 16, "colour": "#FF0000"}]
+		{"type": "rect", "top": 242, "left": 300, "width": 16, "height": 16, "colour": "#FF0000", "pType": "loop", "pWays": [{"x": 280, "y": 242}, {"x": 280, "y": -20}, {"x": 360, "y": -20}, {"x": 360, "y": 242}], "curWay": 0, "speed": 5}]
 }
