@@ -479,7 +479,7 @@ function updateStats() {
 	weight.text = "Weight: " + player.weight + "kg"
 }
 
-
+var iterator = 0;
 //the main game loop
 function gameLoop() {
 	window.requestAnimationFrame(gameLoop);
@@ -608,20 +608,22 @@ function gameLoop() {
 		//if the player is within the enemies view
 		if (playerDist < obj.range && playerAngle - obj.angle < obj.rangeAng) {
 			obj.patroling = false;
-			bullet = {
-				type: "bullet",
-				angle: obj.angle,
-				dist: 10,
-				width: 5,
-				height: 10,
-				colour: "#555555",
-				x: obj.left,
-				y: obj.top,
-				orgX: obj.left,
-				orgY: obj.top,
-				speed: 5
+			if (iterator % obj.fireRate == 0) {
+				bullet = {
+					type: "bullet",
+					angle: obj.angle,
+					dist: 10,
+					width: 5,
+					height: 10,
+					colour: "#555555",
+					x: obj.left,
+					y: obj.top,
+					orgX: obj.left,
+					orgY: obj.top,
+					speed: 5
+				}
+				bullets.push(bullet);
 			}
-			//bullets.push(bullet);
 		} else {
 			obj.patroling = true;
 		}
@@ -644,4 +646,5 @@ function gameLoop() {
 
 	updateStats();
 	render();
+	iterator ++;
 }
