@@ -180,7 +180,7 @@ function init() {
 			bullet = {
 				type: "bullet",
 				angle: player.angle,
-				dist: 10,
+				dist: 20,
 				width: 5,
 				height: 10,
 				colour: "#555555",
@@ -545,6 +545,13 @@ function gameLoop() {
 				bullets.splice(bullets.indexOf(obj), 1);
 			}
 		});
+
+		enemies.forEach(function (i) {
+			if (obj.x > i.left && obj.x < i.left + i.width && obj.y > i.top && obj.y < i.top + i.height) {
+				bullets.splice(bullets.indexOf(obj), 1);
+				i.health -= 100;
+			}
+		});
 	});
 
 	//collisions code
@@ -558,6 +565,10 @@ function gameLoop() {
 	//enemy patrols
 	enemies.forEach(function (obj) {
 		if (obj.pType != null) {
+			if (obj.health <= 0) {
+				enemies.splice(enemies.indexOf(obj), 1);
+				graphObjs.splice(graphObjs.indexOf(obj), 1);
+			}
 			//calculate the distance from the enemy to the player
 			playerDist = Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2));
 			//calculate the angle from the enemy to the player
@@ -612,7 +623,7 @@ function gameLoop() {
 				bullet = {
 					type: "bullet",
 					angle: obj.angle,
-					dist: 10,
+					dist: 20,
 					width: 5,
 					height: 10,
 					colour: "#555555",
