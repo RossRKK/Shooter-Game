@@ -13,6 +13,7 @@ var graphObjs = [];
 var clickObjs = [];
 var bullets = [];
 var level = {};
+var enemies = [];
 
 //object to track the mouse's position
 var mouse = {
@@ -40,6 +41,13 @@ var hitbox;
 //declaration of collidable objects
 var test;
 var test2;
+
+function loadImg(obj) {
+	obj.img.src = obj.source;
+	obj.img.onload = function () {
+		obj.loaded = true;
+	}
+}
 
 function init() {
 	//adding graphical objects
@@ -105,7 +113,34 @@ function init() {
 		collideObjs = level.collideObjs;
 		//add collideobjs to graphobjs array
 		level.collideObjs.forEach(function (obj){
+			if (obj.type == "img") {
+				obj.img = new Image();
+				obj.img.src = obj.source;
+				obj.img.onload = function () {
+					obj.loaded = true;
+				}
+			}
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
+		});
+
+		//load the enemies array
+		enemies = level.enemies;
+		//add all enemies to the collideObjs array
+		collideObjs = collideObjs.concat(enemies);
+
+		//add enemeies to the graphobjs array
+		level.enemies.forEach(function (obj){
+			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
+		});
+
+		enemies.forEach(function (obj) {
+			if (obj.type == "img") {
+				obj.img = new Image();
+				obj.img.src = obj.source;
+				obj.img.onload = function () {
+					obj.loaded = true;
+				}
+			}
 		});
 
 
@@ -145,7 +180,7 @@ function init() {
 			bullet = {
 				type: "bullet",
 				angle: player.angle,
-				dist: 10,
+				dist: 25,
 				width: 5,
 				height: 10,
 				colour: "#555555",
@@ -291,7 +326,7 @@ function init() {
 
 	//onclick event listener
 	//calls an elements clicked function
-	$("canvas").click(function (e) {
+	$("#canvas").click(function (e) {
 		mouse.x = getMousePos(e).x;
 		mouse.y = getMousePos(e).y;
 		
@@ -366,7 +401,9 @@ function render() {
 				ctx.fillStyle = obj.colour;
 				ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
 			} else if (obj.type == "img") {
-				obj.load();
+				if (!obj.loaded) {
+					obj.load();
+				}
 				if (obj.loaded) {
 					//save the unmidified canvas
 					ctx.save();
@@ -442,7 +479,7 @@ function updateStats() {
 	weight.text = "Weight: " + player.weight + "kg"
 }
 
-
+var iterator = 0;
 //the main game loop
 function gameLoop() {
 	window.requestAnimationFrame(gameLoop);
@@ -508,6 +545,19 @@ function gameLoop() {
 				bullets.splice(bullets.indexOf(obj), 1);
 			}
 		});
+		//damge the enemy and remove the bullet if they collide
+		enemies.forEach(function (i) {
+			if (obj.x > i.left && obj.x < i.left + i.width && obj.y > i.top && obj.y < i.top + i.height) {
+				bullets.splice(bullets.indexOf(obj), 1);
+				i.health -= 100;
+			}
+		});
+
+		//damge the player if hit by a bullet
+		if (obj.x > hitbox.left && obj.x < hitbox.right && obj.y > hitbox.top && obj.y < hitbox.bottom) {
+			bullets.splice(bullets.indexOf(obj), 1);
+			player.health -= 10;
+		}
 	});
 
 	//collisions code
@@ -518,6 +568,84 @@ function gameLoop() {
 		}
 	});
 
+	//enemy patrols
+	enemies.forEach(function (obj) {
+		if (obj.pType != null) {
+			if (obj.health <= 0) {
+				enemies.splice(enemies.indexOf(obj), 1);
+				graphObjs.splice(graphObjs.indexOf(obj), 1);
+			}
+			//calculate the distance from the enemy to the player
+			playerDist = Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2));
+			//calculate the angle from the enemy to the player
+			playerAngle = -Math.atan2((obj.left - obj.width/2) - player.left + player.width/2, (obj.top - obj.height/2) - player.top + player.height/2);
+			//do this as many times as the objects speed is
+			for (var i = 0; i < obj.speed; i++) {
+				if (obj.patroling) {
+					//move the object towards the waypoint
+					if (obj.left + obj.width/2 < obj.pWays[obj.curWay].x) {
+						obj.left ++;
+					} else if (obj.left + obj.width/2 > obj.pWays[obj.curWay].x) {
+						obj.left --;
+					}
+					if (obj.top + obj.height/2 < obj.pWays[obj.curWay].y) {
+						obj.top ++;
+					} else if (obj.top + obj.height/2 > obj.pWays[obj.curWay].y) {
+						obj.top --;
+					}
+					//if the object has reached its way point
+					if (Math.round(obj.left + obj.width/2) == Math.round(obj.pWays[obj.curWay].x) && Math.round(obj.top + obj.height/2) == Math.round(obj.pWays[obj.curWay].y)) {
+						//if the patrol type is loop change to correct waypoint
+						if(obj.pType == "loop") {
+							obj.curWay = (obj.curWay + 1) % obj.pWays.length;
+						}
+						//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
+						obj.angle = -Math.atan2((obj.left - obj.width/2) - obj.pWays[obj.curWay].x, (obj.top - obj.height/2) - obj.pWays[obj.curWay].y);
+					}
+				} else {
+					//move the enemy towards the player if the enemey is further than 50px away
+					if (playerDist > 75) {
+						if (obj.left + obj.width/2 < player.left + player.width/2) {
+							obj.left ++;
+						} else if (obj.left + obj.width/2 > player.left + player.width/2) {
+							obj.left --;
+						}
+						if (obj.top + obj.height/2 < player.top + player.height/2) {
+							obj.top ++;
+						} else if (obj.top + obj.height/2 > player.top + player.height/2) {
+							obj.top --;
+						}
+					}
+					//set enemy angle towards player
+					obj.angle = playerAngle;
+				}
+			}
+		}
+
+		//if the player is within the enemies view
+		if (playerDist < obj.range && playerAngle - obj.angle < obj.rangeAng) {
+			obj.patroling = false;
+			if (iterator % obj.fireRate == 0) {
+				bullet = {
+					type: "bullet",
+					angle: obj.angle,
+					dist: 30,
+					width: 5,
+					height: 10,
+					colour: "#555555",
+					x: obj.left,
+					y: obj.top,
+					orgX: obj.left,
+					orgY: obj.top,
+					speed: 5
+				}
+				bullets.push(bullet);
+			}
+		} else {
+			obj.patroling = true;
+		}
+	});
+
 	//move collidable objects
 	collideObjs.forEach(function (obj) {
 		//move objects
@@ -525,6 +653,15 @@ function gameLoop() {
 		obj.top += player.vy;
 	});
 
+	//move waypoints in enemiy objects objects
+	enemies.forEach(function (obj) {
+		obj.pWays.forEach(function (i) {
+			i.x += player.vx;
+			i.y += player.vy;
+		});
+	});
+
 	updateStats();
 	render();
+	iterator ++;
 }
