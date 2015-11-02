@@ -180,7 +180,7 @@ function init() {
 			bullet = {
 				type: "bullet",
 				angle: player.angle,
-				dist: 20,
+				dist: 25,
 				width: 5,
 				height: 10,
 				colour: "#555555",
@@ -545,13 +545,19 @@ function gameLoop() {
 				bullets.splice(bullets.indexOf(obj), 1);
 			}
 		});
-
+		//damge the enemy and remove the bullet if they collide
 		enemies.forEach(function (i) {
 			if (obj.x > i.left && obj.x < i.left + i.width && obj.y > i.top && obj.y < i.top + i.height) {
 				bullets.splice(bullets.indexOf(obj), 1);
 				i.health -= 100;
 			}
 		});
+
+		//damge the player if hit by a bullet
+		if (obj.x > hitbox.left && obj.x < hitbox.right && obj.y > hitbox.top && obj.y < hitbox.bottom) {
+			bullets.splice(bullets.indexOf(obj), 1);
+			player.health -= 10;
+		}
 	});
 
 	//collisions code
@@ -623,7 +629,7 @@ function gameLoop() {
 				bullet = {
 					type: "bullet",
 					angle: obj.angle,
-					dist: 20,
+					dist: 30,
 					width: 5,
 					height: 10,
 					colour: "#555555",
