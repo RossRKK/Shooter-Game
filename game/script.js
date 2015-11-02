@@ -563,6 +563,14 @@ function gameLoop() {
 		obj.top += player.vy;
 	});
 
+	//move waypoints in enemiy objects objects
+	enemies.forEach(function (obj) {
+		obj.pWays.forEach(function (i) {
+			i.x += player.vx;
+			i.y += player.vy;
+		});
+	});
+
 	updateStats();
 	render();
 }
