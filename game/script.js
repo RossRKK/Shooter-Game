@@ -13,6 +13,7 @@ var graphObjs = [];
 var clickObjs = [];
 var bullets = [];
 var level = {};
+var enemies = [];
 
 //object to track the mouse's position
 var mouse = {
@@ -105,6 +106,16 @@ function init() {
 		collideObjs = level.collideObjs;
 		//add collideobjs to graphobjs array
 		level.collideObjs.forEach(function (obj){
+			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
+		});
+
+		//load the enemies array
+		enemies = level.enemies;
+		//add all enemies to the collideObjs array
+		collideObjs = collideObjs.concat(enemies);
+
+		//add enemeies to the graphobjs array
+		level.enemies.forEach(function (obj){
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
 		});
 

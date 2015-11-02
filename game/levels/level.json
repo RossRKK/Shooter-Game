@@ -2,6 +2,7 @@
 	"title": "Level 1",
 	"collideObjs": [
 		{"type": "rect", "top": 300, "left": 300, "width": 40, "height": 200, "colour": "#787878"},
-		{"type": "rect", "top": 0, "left": 300, "width": 40, "height": 200, "colour": "#787878"}
-	]
+		{"type": "rect", "top": 0, "left": 300, "width": 40, "height": 200, "colour": "#787878"}],
+	"enemies": [
+		{"type": "rect", "top": 242, "left": 300, "width": 16, "height": 16, "colour": "#FF0000"}]
 }
