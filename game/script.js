@@ -495,7 +495,7 @@ var iterator = 0;
 function gameLoop() {
 	window.requestAnimationFrame(gameLoop);
 	//calculate the angle that the player should face
-	player.angle = -Math.atan2((player.left - player.width/2) - mouse.x, (player.top - player.height/2) - mouse.y);
+	player.angle = -Math.atan2(player.left - mouse.x, player.top - mouse.y);
 
 	//resistance
 	player.vx = player.vx * 0.9;
@@ -632,7 +632,7 @@ function gameLoop() {
 							obj.curWay = (obj.curWay + 1) % obj.pWays.length;
 						}
 						//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
-						obj.angle = -Math.atan2((obj.left - obj.width/2) - obj.pWays[obj.curWay].x, (obj.top - obj.height/2) - obj.pWays[obj.curWay].y);
+						obj.angle = -Math.atan2(obj.left - obj.pWays[obj.curWay].x, obj.top - obj.pWays[obj.curWay].y);
 					}
 				} else {
 					//move the enemy towards the player if the enemey is further than 50px away
