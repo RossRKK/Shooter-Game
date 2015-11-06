@@ -411,7 +411,9 @@ function init() {
 			}, false, false, false]
 		}
 	}
-	GameController.init( options );
+	if ('ontouchstart' in window || navigator.msMaxTouchPointst) {
+		GameController.init(options);
+	}
 }
 
 //function that calculates the mouses actual position on the canvas
