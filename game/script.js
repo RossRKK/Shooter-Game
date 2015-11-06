@@ -211,7 +211,9 @@ function init() {
 		charge: 100,
 		maxCharge: 100,
 		efficiency: 100,
-		weight: 100
+		weight: 100,
+		normalizedX: 0,
+		normalizedY: 0
 	}
 	graphObjs.push(player);
 
@@ -386,6 +388,30 @@ function init() {
 			d = false;
 		}
 	});
+
+	var options = {
+		left: {
+			type: "joystick",
+			position: {
+				left: '8%',
+				bottom: '15%'
+			},
+			joystick: {
+				touchMove: function (details) {
+					player.normalizedX = details.normalizedX;
+					player.normalizedY = details.normalizedY;
+				}
+			}
+		},
+		right: {
+			type: "buttons",
+			buttons: [
+			{
+				label: "fire", fontSize: 13, offset: {x: '8%', y: '7%'}
+			}, false, false, false]
+		}
+	}
+	GameController.init( options );
 }
 
 //function that calculates the mouses actual position on the canvas
@@ -486,8 +512,8 @@ function updateStats() {
 	//update the statis bars
 	healthBar.width = healthBarBack.width - (player.maxHealth - player.health) * (healthBarBack.width/player.maxHealth);
 	chargeBar.width = chargeBarBack.width - (player.maxCharge - player.charge) * (chargeBarBack.width/player.maxCharge);
-	efficiency.text = "Efficiency: " + player.efficiency + "%"
-	weight.text = "Weight: " + player.weight + "kg"
+	efficiency.text = "Efficiency: " + player.efficiency + "%";
+	weight.text = "Weight: " + player.weight + "kg";
 }
 
 var iterator = 0;
@@ -495,7 +521,11 @@ var iterator = 0;
 function gameLoop() {
 	window.requestAnimationFrame(gameLoop);
 	//calculate the angle that the player should face
-	player.angle = -Math.atan2(player.left - mouse.x, player.top - mouse.y);
+	if ('ontouchstart' in window || navigator.msMaxTouchPointst) { //if touch screen
+		player.angle = Math.atan2(player.normalizedX, player.normalizedY);
+	} else {
+		player.angle = -Math.atan2(player.left - mouse.x, player.top - mouse.y);
+	}
 
 	//resistance
 	player.vx = player.vx * 0.9;
@@ -506,6 +536,9 @@ function gameLoop() {
 	if (player.vy < 0.1 && player.vy > -0.1) {
 		player.vy = 0;
 	}
+	//movement for joystick
+	player.vx -= player.normalizedX * player.speed;
+	player.vy += player.normalizedY * player.speed;
 
 	//control inputs
 	if (w && player.charge > 0) {
