@@ -407,7 +407,7 @@ function init() {
 			type: "buttons",
 			buttons: [
 			{
-				label: "fire", fontSize: 13, offset: {x: '8%', y: '7%'}
+				label: "fire", fontSize: 13, offset: {x: '8%', y: '7%'}, touchStart: player.fire
 			}, false, false, false]
 		}
 	}
