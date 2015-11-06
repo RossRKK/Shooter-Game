@@ -14,6 +14,7 @@ var clickObjs = [];
 var bullets = [];
 var level = {};
 var enemies = [];
+var consumables = [];
 
 //object to track the mouse's position
 var mouse = {
@@ -128,6 +129,14 @@ function init() {
 		//add all enemies to the collideObjs array
 		collideObjs = collideObjs.concat(enemies);
 
+		//load the consumables array
+		consumables = level.consumables;
+
+		//add consumables to the graphobjs array
+		level.consumables.forEach(function (obj){
+			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
+		});
+
 		//add enemeies to the graphobjs array
 		level.enemies.forEach(function (obj){
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
@@ -198,9 +207,13 @@ function init() {
 		ammo: 16,
 		maxAmmo: 16,
 		health: 100,
+		maxHealth: 100,
 		charge: 100,
+		maxCharge: 100,
 		efficiency: 100,
-		weight: 100
+		weight: 100,
+		normalizedX: 0,
+		normalizedY: 0
 	}
 	graphObjs.push(player);
 
@@ -375,6 +388,32 @@ function init() {
 			d = false;
 		}
 	});
+
+	var options = {
+		left: {
+			type: "joystick",
+			position: {
+				left: '8%',
+				bottom: '15%'
+			},
+			joystick: {
+				touchMove: function (details) {
+					player.normalizedX = details.normalizedX;
+					player.normalizedY = details.normalizedY;
+				}
+			}
+		},
+		right: {
+			type: "buttons",
+			buttons: [
+			{
+				label: "fire", fontSize: 13, offset: {x: '8%', y: '7%'}, touchStart: player.fire
+			}, false, false, false]
+		}
+	}
+	if ('ontouchstart' in window || navigator.msMaxTouchPointst) {
+		GameController.init(options);
+	}
 }
 
 //function that calculates the mouses actual position on the canvas
@@ -473,10 +512,10 @@ function updateStats() {
 	//set speed based on efficiency
 	player.speed = player.efficiency/200;
 	//update the statis bars
-	healthBar.width = player.health * 2;
-	chargeBar.width = player.charge * 2;
-	efficiency.text = "Efficiency: " + player.efficiency + "%"
-	weight.text = "Weight: " + player.weight + "kg"
+	healthBar.width = healthBarBack.width - (player.maxHealth - player.health) * (healthBarBack.width/player.maxHealth);
+	chargeBar.width = chargeBarBack.width - (player.maxCharge - player.charge) * (chargeBarBack.width/player.maxCharge);
+	efficiency.text = "Efficiency: " + player.efficiency + "%";
+	weight.text = "Weight: " + player.weight + "kg";
 }
 
 var iterator = 0;
@@ -484,7 +523,11 @@ var iterator = 0;
 function gameLoop() {
 	window.requestAnimationFrame(gameLoop);
 	//calculate the angle that the player should face
-	player.angle = -Math.atan2((player.left - player.width/2) - mouse.x, (player.top - player.height/2) - mouse.y);
+	if ('ontouchstart' in window || navigator.msMaxTouchPointst) { //if touch screen
+		player.angle = Math.atan2(player.normalizedX, player.normalizedY);
+	} else {
+		player.angle = -Math.atan2(player.left - mouse.x, player.top - mouse.y);
+	}
 
 	//resistance
 	player.vx = player.vx * 0.9;
@@ -495,6 +538,9 @@ function gameLoop() {
 	if (player.vy < 0.1 && player.vy > -0.1) {
 		player.vy = 0;
 	}
+	//movement for joystick
+	player.vx -= player.normalizedX * player.speed;
+	player.vy += player.normalizedY * player.speed;
 
 	//control inputs
 	if (w && player.charge > 0) {
@@ -568,6 +614,27 @@ function gameLoop() {
 		}
 	});
 
+	//consumables collisions
+	consumables.forEach(function (obj) {
+		if (obj.left + obj.width > hitbox.left && obj.left < hitbox.right && obj.top + obj.height > hitbox.top && obj.top < hitbox.bottom) {
+			if (obj.resource == "health") {
+				player.health += obj.supply;
+				if (player.health > player.maxHealth) {
+					player.health = player.maxHealth;
+				}
+				consumables.splice(consumables.indexOf(obj), 1);
+				graphObjs.splice(graphObjs.indexOf(obj), 1);
+			} else if (obj.resource == "charge") {
+				player.charge += supply;
+				if (player.charge > player.maxCharge) {
+					player.charge = player.maxCharge;
+				}
+				consumables.splice(consumables.indexOf(obj), 1);
+				graphObjs.splice(graphObjs.indexOf(obj), 1);
+			}
+		}
+	});
+
 	//enemy patrols
 	enemies.forEach(function (obj) {
 		if (obj.pType != null) {
@@ -600,7 +667,7 @@ function gameLoop() {
 							obj.curWay = (obj.curWay + 1) % obj.pWays.length;
 						}
 						//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
-						obj.angle = -Math.atan2((obj.left - obj.width/2) - obj.pWays[obj.curWay].x, (obj.top - obj.height/2) - obj.pWays[obj.curWay].y);
+						obj.angle = -Math.atan2(obj.left - obj.pWays[obj.curWay].x, obj.top - obj.pWays[obj.curWay].y);
 					}
 				} else {
 					//move the enemy towards the player if the enemey is further than 50px away
@@ -646,13 +713,9 @@ function gameLoop() {
 		}
 	});
 
-	//move collidable objects
-	collideObjs.forEach(function (obj) {
-		//move objects
-		obj.left += player.vx;
-		obj.top += player.vy;
-	});
-
+	//update positions
+	updatePos(collideObjs);
+	updatePos(consumables);
 	//move waypoints in enemiy objects objects
 	enemies.forEach(function (obj) {
 		obj.pWays.forEach(function (i) {
@@ -664,4 +727,12 @@ function gameLoop() {
 	updateStats();
 	render();
 	iterator ++;
+}
+
+function updatePos(arr) {
+	arr.forEach(function (obj) {
+		//move objects
+		obj.left += player.vx;
+		obj.top += player.vy;
+	});
 }
