@@ -625,13 +625,20 @@ function gameLoop() {
 				consumables.splice(consumables.indexOf(obj), 1);
 				graphObjs.splice(graphObjs.indexOf(obj), 1);
 			} else if (obj.resource == "charge") {
-				player.charge += supply;
+				player.charge += obj.supply;
 				if (player.charge > player.maxCharge) {
 					player.charge = player.maxCharge;
 				}
 				consumables.splice(consumables.indexOf(obj), 1);
 				graphObjs.splice(graphObjs.indexOf(obj), 1);
-			}
+			} else if (obj.resource == "ammo") {
+				player.ammo += obj.supply;
+				if (player.ammo > player.maxAmmo) {
+					player.ammo = player.maxAmmo;
+				}
+				consumables.splice(consumables.indexOf(obj), 1);
+				graphObjs.splice(graphObjs.indexOf(obj), 1);
+			} 
 		}
 	});
 

@@ -6,6 +6,6 @@
 	"enemies": [
 		{"type": "img", "top": 242, "left": 300, "width": 20, "height": 20, "colour": "#FF0000", "pType": "loop", "pWays": [{"x": 280, "y": 242}, {"x": 280, "y": -20}, {"x": 360, "y": -20}, {"x": 360, "y": 242}], "curWay": 0, "speed": 3, "patroling": true, "range": 200, "rangeAng": 1.5707963267948966, "health": 100, "fireRate": 30, "source": "player.png", "img": null, "loaded": false, "angle": 0}],
 	"consumables": [
-		{"type": "rect", "top": 200, "left": 400, "width": 60, "height": 60, "colour": "#FF0000", "resource": "health", "supply": 25}
+		{"type": "rect", "top": 200, "left": 400, "width": 60, "height": 60, "colour": "#FF0000", "resource": "ammo", "supply": 25}
 	]
 }
