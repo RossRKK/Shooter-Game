@@ -556,7 +556,7 @@ function gameLoop() {
 		player.vx -= player.speed;
 	}
 	//drain charge if the player is moving
-	if((w || a || s || d) && player.charge > 0) {
+	if((player.vy > 0 || player.vx > 0) && player.charge > 0) {
 		player.charge -= 1/player.efficiency;
 	}
 
