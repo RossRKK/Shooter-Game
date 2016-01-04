@@ -186,9 +186,7 @@ function init() {
 		efficiency: 100,
 		weight: 100,
 		normalizedX: 0,
-		normalizedY: 0,
-		bottom: 0,
-		right: 0
+		normalizedY: 0
 	}
 	graphObjs.push(player);
 
