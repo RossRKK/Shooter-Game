@@ -286,8 +286,8 @@ function init() {
 
 	gunIcon = {
 		type: "img",
-		top: gameWin.top + gameWin.height + 40,
-		left: rightBar.left + rightBar.width/2,
+		top: gameWin.top + gameWin.height,
+		left: rightBar.left + rightBar.width/2 - 32,
 		width: 64,
 		height: 64,
 		source: "textures/guns/pistol.png",
@@ -420,11 +420,11 @@ function render() {
 					//save the unmidified canvas
 					ctx.save();
 					//translate the canvas to the objects position
-					ctx.translate(obj.left, obj.top);
+					ctx.translate(obj.left + obj.width/2, obj.top + obj.height/2);
 					//roatate the object at the correct angle
 					ctx.rotate(obj.angle);
 					//draw the player icon
-					ctx.drawImage(obj.img, - obj.width/2, - obj.height/2, obj.width, obj.height);
+					ctx.drawImage(obj.img, -obj.width/2, -obj.height/2, obj.width, obj.height);
 					//restore the canavs to its original state
 					ctx.restore();
 				}
