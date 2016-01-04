@@ -36,8 +36,8 @@ var rightBar;
 var bottomBar;
 var player;
 
-//the players hitbox
-var hitbox;
+//the players player
+var player;
 
 function loadImg(obj) {
 	obj.img = new Image();
@@ -186,17 +186,11 @@ function init() {
 		efficiency: 100,
 		weight: 100,
 		normalizedX: 0,
-		normalizedY: 0
+		normalizedY: 0,
+		bottom: 0,
+		right: 0
 	}
 	graphObjs.push(player);
-
-	//declaring the dimensions of the players hit box
-	hitbox = {
-		top: player.top - 5,
-		left: player.left - 5,
-		bottom: player.top + player.height - 15,
-		right: player.left + player.width - 15
-	}
 
 	//status bars
 	//health bar
@@ -573,7 +567,7 @@ function gameLoop() {
 		});
 
 		//damge the player if hit by a bullet
-		if (obj.x > hitbox.left && obj.x < hitbox.right && obj.y > hitbox.top && obj.y < hitbox.bottom) {
+		if (obj.x > player.left && obj.x < player.left + player.width && obj.y > player.top && obj.y < player.top + player.height) {
 			bullets.splice(bullets.indexOf(obj), 1);
 			player.health -= 10;
 		}
@@ -581,7 +575,7 @@ function gameLoop() {
 
 	//collisions code
 	collideObjs.forEach(function (obj) {
-		if (obj.left + obj.width > hitbox.left && obj.left < hitbox.right && obj.top + obj.height > hitbox.top && obj.top < hitbox.bottom) {
+		if (obj.left + obj.width > player.left && obj.left < player.left + player.width && obj.top + obj.height > player.top && obj.top < player.top + player.height) {
 			player.vy = -player.vy;
 			player.vx = -player.vx;
 		}
@@ -589,7 +583,7 @@ function gameLoop() {
 
 	//consumables collisions
 	consumables.forEach(function (obj) {
-		if (obj.left + obj.width > hitbox.left && obj.left < hitbox.right && obj.top + obj.height > hitbox.top && obj.top < hitbox.bottom) {
+		if (obj.left + obj.width > player.left && obj.left < player.left + player.width && obj.top + obj.height > player.top && obj.top < player.top + player.height) {
 			if (obj.resource == "health") {
 				player.health += obj.supply;
 				if (player.health > player.maxHealth) {
