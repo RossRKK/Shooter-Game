@@ -168,8 +168,8 @@ function init() {
 				colour: "#555555",
 				x: player.left,
 				y: player.top,
-				orgX: player.left,
-				orgY: player.top,
+				orgX: player.left + player.width/2,
+				orgY: player.top + player.height/2,
 				speed: 5
 			}
 			if (player.ammo > 0) {;
@@ -621,6 +621,7 @@ function gameLoop() {
 			if (obj.health <= 0) {
 				enemies.splice(enemies.indexOf(obj), 1);
 				graphObjs.splice(graphObjs.indexOf(obj), 1);
+				collideObjs.splice(graphObjs.indexOf(obj), 1);
 			}
 			//calculate the distance from the enemy to the player
 			playerDist = Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2));
@@ -682,8 +683,8 @@ function gameLoop() {
 					colour: "#555555",
 					x: obj.left,
 					y: obj.top,
-					orgX: obj.left,
-					orgY: obj.top,
+					orgX: obj.left + obj.width/2,
+					orgY: obj.top + obj.height/2,
 					speed: 5
 				}
 				bullets.push(bullet);
