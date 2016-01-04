@@ -147,8 +147,8 @@ function init() {
 	//player icon
 	player = {
 		type: "img",
-		top: gameWin.top + (gameWin.height/2),
-		left: gameWin.left + (gameWin.width/2),
+		top: gameWin.top + gameWin.height/2 - 10,
+		left: gameWin.left + gameWin.width/2 - 10,
 		width: 20,
 		height: 20,
 		source: "textures/player.png",
@@ -186,7 +186,9 @@ function init() {
 		efficiency: 100,
 		weight: 100,
 		normalizedX: 0,
-		normalizedY: 0
+		normalizedY: 0,
+		x: 0,
+		y: 0
 	}
 	graphObjs.push(player);
 
@@ -486,6 +488,8 @@ function updateStats() {
 var iterator = 0;
 //the main game loop
 function gameLoop() {
+	player.x = 0;
+	player.y = 0;
 	window.requestAnimationFrame(gameLoop);
 	//calculate the angle that the player should face
 	if ('ontouchstart' in window || navigator.msMaxTouchPointst) { //if touch screen
@@ -574,8 +578,20 @@ function gameLoop() {
 	//collisions code
 	collideObjs.forEach(function (obj) {
 		if (obj.left + obj.width > player.left && obj.left < player.left + player.width && obj.top + obj.height > player.top && obj.top < player.top + player.height) {
-			player.vy = -player.vy;
-			player.vx = -player.vx;
+			player.vy += -player.vy;
+			player.vx += -player.vx;
+			if (player.left + player.width > obj.width + obj.left) {
+				player.x += player.left - (obj.left + obj.width);
+			}
+			if (player.left < obj.left) {
+				player.x += player.left - (obj.left - player.width);
+			}
+			if (player.top + player.height > obj.height + obj.top) {
+				player.y += player.top - (obj.top + obj.height);
+			}
+			if (player.top < obj.top) {
+				player.y += player.top - (obj.top - player.height);
+			}
 		}
 	});
 
@@ -607,7 +623,7 @@ function gameLoop() {
 		}
 	});
 
-	//enemy patrols
+	//enemy patrols (essetnially everything that the enemies do)
 	enemies.forEach(function (obj) {
 		if (obj.pType != null) {
 			if (obj.health <= 0) {
@@ -707,5 +723,7 @@ function updatePos(arr) {
 		//move objects
 		obj.left += player.vx;
 		obj.top += player.vy;
+		obj.left += player.x;
+		obj.top += player.y;
 	});
 }
