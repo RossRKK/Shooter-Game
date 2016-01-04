@@ -39,11 +39,8 @@ var player;
 //the players hitbox
 var hitbox;
 
-//declaration of collidable objects
-var test;
-var test2;
-
 function loadImg(obj) {
+	obj.img = new Image();
 	obj.img.src = obj.source;
 	obj.img.onload = function () {
 		obj.loaded = true;
@@ -114,13 +111,6 @@ function init() {
 		collideObjs = level.collideObjs;
 		//add collideobjs to graphobjs array
 		level.collideObjs.forEach(function (obj){
-			if (obj.type == "img") {
-				obj.img = new Image();
-				obj.img.src = obj.source;
-				obj.img.onload = function () {
-					obj.loaded = true;
-				}
-			}
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
 		});
 
@@ -142,17 +132,6 @@ function init() {
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
 		});
 
-		enemies.forEach(function (obj) {
-			if (obj.type == "img") {
-				obj.img = new Image();
-				obj.img.src = obj.source;
-				obj.img.onload = function () {
-					obj.loaded = true;
-				}
-			}
-		});
-
-
 		title = {
 			type: "text",
 			font: "30px Palatino Linotype",
@@ -172,15 +151,9 @@ function init() {
 		left: gameWin.left + (gameWin.width/2),
 		width: 20,
 		height: 20,
-		source: "player.png",
+		source: "textures/player.png",
 		img: new Image(),
 		loaded: false,
-		load: function () {
-			player.img.src = player.source;
-			player.img.onload = function () {
-				player.loaded = true;
-			}
-		},
 		angle: Math.PI,
 		vx: 0,
 		vy: 0,
@@ -441,7 +414,7 @@ function render() {
 				ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
 			} else if (obj.type == "img") {
 				if (!obj.loaded) {
-					obj.load();
+					loadImg(obj);
 				}
 				if (obj.loaded) {
 					//save the unmidified canvas
