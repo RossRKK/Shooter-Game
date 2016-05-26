@@ -887,91 +887,6 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 			side = "bottom";
 		}
 	}
-
-	/*//translate the dimension of the object to our local coordinate system
-	obtop = curY - obj.top;
-	bottom = curY - (obj.top + obj.height);
-	left = obj.left - curX;
-	right = obj.left + obj.width - curX;
-	//calculate the intercepts
-	iRight = right*m;
-	iLeft = left*m;
-	iTop = top/m;
-	iBottom = bottom/m;
-
-	//check if it actually intersects#
-	intersectsRight = iRight >= bottom && iRight <= obtop;
-	intersectsLeft = iLeft >= bottom && iLeft <= obtop;
-	intersectsTop = iTop >= left && iTop <= right;
-	intersectsBottom = iBottom >= left && iBottom <= right;
-	//check which of the 3 possible ways to intersect a rectangle this is
-	if (intersectsLeft && intersectsTop) {
-		if (curY > tarY) {
-			side = "left";
-		} else {
-			side = "top";
-		}
-	} else if (intersectsBottom && intersectsRight) {
-		if (curY > tarY) {
-			side = "bottom";
-		} else {
-			side = "right";
-		}
-
-	} else if (intersectsTop && intersectsBottom) {
-		if (curY >= tarY) {
-			side = "bottom";
-		} else {
-			side = "top";
-		}
-	} else if (intersectsLeft && intersectsRight) {
-		if (curX > tarX) {
-			side = "right";
-		} else {
-			side = "left";
-		}
-	} if (intersectsLeft && intersectsBottom) {
-		if (curY > tarY) {
-			side = "bottom";
-		} else {
-			side = "left";
-		}
-	} else if (intersectsTop && intersectsRight) {
-		if (curY > tarY) {
-			side = "right";
-		} else {
-			side = "top";
-		}
-	}
-
-	//check m isn't NaN
-	if (!(m >= 0) && !(m < 0)) {
-		if (curY > collideObjs[i].height + collideObjs[i].top) {
-			side = "bottom";
-		} else {
-			side = "top";
-		}
-	}
-
-	//i do not knwo why any of this bit would ever need to be used but soemtimes we intersect 1 or no sides apparently
-	if (side == null) {
-		//i don't know why this bit is needed but apparently it is (sometimes we onlyintersect one side)
-		if (intersectsRight) {
-			side = "right"
-		}
-		if (intersectsLeft) {
-			side = "left";
-		}
-		if (intersectsTop) {
-			side = "top";
-		}
-		if (intersectsBottom) {
-			side = "bottom";
-		}
-	}
-	if (side == null) {
-		side = "beats me";
-	}*/
 	return side;
 }
 
@@ -981,41 +896,33 @@ closest = 100;
 if (collision.side == "left") {
 	if (player.top < obj.top) {
 		//top left
-		console.log("1")
 		obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
 	} else {
 		//bottom left
-		console.log("2")
 		obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
 	}
 } else if (collision.side == "right") {
 	if (player.top < obj.top) {
 		//top right
-		console.log("3")
 		obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
 	} else {
 		//bottom right
-		console.log("4")
 		obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
 	}
 } else if (collision.side == "top") {
 	if (player.left > obj.left) {
 		//top right
-		console.log("5")
 		obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
 	} else {
 		//top left
-		console.log("6")
 		obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
 	}
 } else if (collision.side == "bottom") {
 	if (player.left > obj.left) {
 		//bottom right
-		console.log("7")
 		obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
 	} else {
 		//bottom left
-		console.log("8")
 		obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
 	}
 }
