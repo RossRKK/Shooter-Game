@@ -652,9 +652,9 @@ function gameLoop() {
 					} else {
 						wayY = player.top - closest;
 					}
-					if(obj.setNewWay) { //prevent a new waypoint being set if we can't see the player
+					//if(obj.setNewWay) { //prevent a new waypoint being set if we can't see the player
 						if (collision.obj != null) {
-							closest = 50;
+							closest = 100;
 							//find which side we collide with
 							if (collision.side == "left") {
 								if (player.top < obj.top) {
@@ -688,15 +688,7 @@ function gameLoop() {
 									//bottom left
 									obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
 								}
-							} else {
-								//somehow we have a collision but don't knwo what side its on, lets set a new waypoint next time
-								/*obj.way = {
-									x: obj.left,
-									y: obj.top
-								}*/
-								obj.setNewWay = false;
 							}
-							obj.setNewWay = !obj.setNewWay; //hackiness
 						} else {
 							//no collision move straight to the player
 							//move the enemy towards the player
@@ -704,10 +696,10 @@ function gameLoop() {
 								x: wayX,
 								y: wayY
 							}
-							obj.setNewWay = true;
 						}
-					}
+					//}
 				}
+				console.log(obj.way)
 				//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
 				obj.angle = -Math.atan2(obj.left - obj.way.x, obj.top - obj.way.y);
 				//move the object towards the waypoint
@@ -724,7 +716,6 @@ function gameLoop() {
 					if(obj.patroling && obj.pType == "loop") {
 						obj.curWay = (obj.curWay + 1) % obj.pWays.length;
 					}
-					obj.setNewWay = true;
 				}
 			//}
 		}
@@ -882,9 +873,6 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 	right = collideObjs[i].left + collideObjs[i].width;
 	bottom = collideObjs[i].top + collideObjs[i].height;
 
-	console.log("Top: " + obtop);
-	console.log("Bottom: " + bottom);
-	console.log("curY: " + curY);
 	if (curY >= obtop && curY <= bottom) {//if the current position is between the top and bottom of the rect
 		if (curX < left) { //if we're left of the object
 			side = "left";
