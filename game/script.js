@@ -711,16 +711,6 @@ function gameLoop() {
 				//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
 				obj.angle = -Math.atan2(obj.left - obj.way.x, obj.top - obj.way.y);
 				//move the object towards the waypoint
-				/*if (obj.left + obj.width/2 < obj.way.x) {
-					obj.left ++;
-				} else if (obj.left + obj.width/2 > obj.way.x) {
-					obj.left --;
-				}
-				if (obj.top + obj.height/2 < obj.way.y) {
-					obj.top ++;
-				} else if (obj.top + obj.height/2 > obj.way.y) {
-					obj.top --;
-				}*/
 				//calculate how far up and along we need to go if we want to move excatly the objects speed
 				dy = -obj.speed * Math.cos(obj.angle);
 				dx = obj.speed * Math.sin(obj.angle);
@@ -887,34 +877,37 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 	//imagine the line drawn on a graph where the current position is the origin
 	m = (curY - tarY)/(tarX - curX); //calculate the gradient of the line between the 2 positions
 
-	top = collideObjs[i].top;
+	obtop = collideObjs[i].top;
 	left = collideObjs[i].left;
 	right = collideObjs[i].left + collideObjs[i].width;
 	bottom = collideObjs[i].top + collideObjs[i].height;
 
-	if (curY >= top && curY <= bottom) {//if the current position is between the top and bottom of the rect
+	console.log("Top: " + obtop);
+	console.log("Bottom: " + bottom);
+	console.log("curY: " + curY);
+	if (curY >= obtop && curY <= bottom) {//if the current position is between the top and bottom of the rect
 		if (curX < left) { //if we're left of the object
 			side = "left";
 		} else {
 			side = "right";
 		}
 	} else if (curX >= left && curX <= right) {//if the current position is between the left and right
-		if (curY < top) { //if we're above the object
+		if (curY < obtop) { //if we're above the object
 			side = "top";
 		} else {
 			side = "bottom";
 		}
-	} else if (curX <= left && curY <= top) {//you are in the top left corner
+	} else if (curX <= left && curY <= obtop) {//you are in the top left corner
 		//calulate the gradient to the top left corner
-		mc = (curY - top)/(left - curX);
+		mc = (curY - obtop)/(left - curX);
 		if (m > mc) { //a gradient larger than the gradient to the corner will hit the top
 			side = "top";
 		} else {
 			side = "bottom";
 		}
-	} else if (curX >= right && curY <= top) {//top right corner
+	} else if (curX >= right && curY <= obtop) {//top right corner
 		//calculate the gradient to the top right corner
-		mc = (curY - top)/(right - curX);
+		mc = (curY - obtop)/(right - curX);
 		if (m < mc) { //a gradient smaller than mc will hit the top
 			side = "top";
 		} else {
