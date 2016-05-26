@@ -3,7 +3,7 @@
 	"collideObjs": [
 		{"type": "rect", "top": 300, "left": 300, "width": 40, "height": 200, "colour": "#787878"},
 		{"type": "rect", "top": 0, "left": 300, "width": 40, "height": 200, "colour": "#787878"},
-        {"type": "rect", "top": 0, "left": 600, "width": 40, "height": 200, "colour": "#787878"}],
+        {"type": "rect", "top": 0, "left": 600, "width": 200, "height": 200, "colour": "#787878"}],
 	"enemies": [
 		{"type": "img", "top": 242, "left": 300, "width": 20, "height": 20, "pType": "loop", "pWays": [{"x": 280, "y": 242}, {"x": 280, "y": -20}, {"x": 360, "y": -20}, {"x": 360, "y": 242}], "curWay": 0, "speed": 1, "patroling": true, "setNewWay": true, "way": null, "range": 5000, "rangeAng": 3, "health": 100, "fireRate": 0, "source": "textures/enemies/default.png", "img": null, "loaded": false, "angle": 0}],
 	"consumables": [
