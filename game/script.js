@@ -764,6 +764,8 @@ function gameLoop() {
 	enemies.forEach(function (obj) {
 		obj.left += player.vx;
 		obj.top += player.vy;
+		obj.way.x += player.vx;
+		obj.way.y += player.vy;
 		obj.pWays.forEach(function (i) {
 			i.x += player.vx;
 			i.y += player.vy;
@@ -874,38 +876,95 @@ function isColliding(x, y, i) {
 }
 
 //returns the side of the collide obj hit if you where to travel from the current position to the target
-function getSide(curX, curY, tarX, tarY, i) {
+function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it will only work properly on a square
+	//imagine the line drawn on a graph where the current position is the origin
 	m = (curY - tarY)/(tarX - curX); //calculate the gradient of the line between the 2 positions
 
-	if (m >= 0 && curX < tarX) {
-		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
+	//translate the dimension of the object to our local coordinate system
+	obtop = curY - obj.top;
+	bottom = curY - (obj.top + obj.height);
+	left = obj.left - curX;
+	right = obj.left + obj.width - curX;
+	//calculate the intercepts
+	iRight = right*m;
+	iLeft = left*m;
+	iTop = top/m;
+	iBottom = bottom/m;
+
+	//check if it actually intersects
+	intersectsRight = iRight > bottom && iRight < obtop;
+	intersectsLeft = iLeft > bottom && iLeft < obtop;
+	intersectsTop = iTop > left && iTop < right;
+	intersectsBottom = iBottom > left && iBottom < right;
+	//check which of the 3 possible ways to intersect a rectangle this is
+	if (intersectsLeft && intersectsTop) {
+		if (curY > tarY) {
 			side = "left";
-		} else if (collideObjs[i].width + collideObjs[i].left > curY && collideObjs[i].left < curY) {
+		} else {
+			side = "top";
+		}
+	} else if (intersectsBottom && intersectsRight) {
+		if (curY > tarY) {
+			side = "bottom";
+		} else {
+			side = "right";
+		}
+
+	} else if (intersectsTop && intersectsBottom) {
+		if (curY > tarY) {
+			side = "bottom";
+		} else {
+			side = "top";
+		}
+	} else if (intersectsLeft && intersectsRight) {
+		if (curX > tarX) {
+			side = "right";
+		} else {
+			side = "left";
+		}
+	} if (intersectsLeft && intersectsBottom) {
+		if (curY > tarY) {
+			side = "bottom";
+		} else {
+			side = "left";
+		}
+	} else if (intersectsTop && intersectsRight) {
+		if (curY > tarY) {
+			side = "right";
+		} else {
+			side = "top";
+		}
+	}
+
+	/*if (m >= 0 && curX < tarX) {
+		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) { // this isn't right
+			side = "left";
+		} else if (collideObjs[i].width + collideObjs[i].left > curX && collideObjs[i].left < curX) {
 			side = "bottom";
 		}
 
 	} else if (m < 0 && curX < tarX) {
 		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
 			side = "left";
-		} else if (collideObjs[i].width + collideObjs[i].left > curY && collideObjs[i].left < curY) {
+		} else if (collideObjs[i].width + collideObjs[i].left > curX && collideObjs[i].left < curX) {
 			side = "top";
 		}
 	} else if (m >= 0 && curX > tarX) {
 		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
 			side = "right";
-		} else if (collideObjs[i].width + collideObjs[i].left > curY && collideObjs[i].left < curY) {
+		} else if (collideObjs[i].width + collideObjs[i].left > curX && collideObjs[i].left < curX) {
 			side = "top";
 		}
 
 	} else if (m < 0 && curX > tarX) {
 		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
 			side = "right";
-		} else if (collideObjs[i].width + collideObjs[i].left > curY && collideObjs[i].left < curY) {
+		} else if (collideObjs[i].width + collideObjs[i].left > curX && collideObjs[i].left < curX) {
 			side = "bottom";
 		}
-	} else 
+	}*/
 	//check m isn't NaN
-	if (!(m >= 0 && m < 0)) {
+	if (!(m >= 0) && !(m < 0)) {
 		if (curY > collideObjs[i].height + collideObjs[i].top) {
 			side = "bottom";
 		} else {
