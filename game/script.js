@@ -654,7 +654,7 @@ function gameLoop() {
 					}
 					if(obj.setNewWay) { //prevent a new waypoint being set if we can't see the player
 						if (collision.obj != null) {
-							closest = 30;
+							closest = 100;
 							//find which side we collide with
 							if (collision.side == "left") {
 								if (player.top < obj.top) {
@@ -879,7 +879,60 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 	//imagine the line drawn on a graph where the current position is the origin
 	m = (curY - tarY)/(tarX - curX); //calculate the gradient of the line between the 2 positions
 
-	//translate the dimension of the object to our local coordinate system
+	top = collideObjs[i].top;
+	left = collideObjs[i].left;
+	right = collideObjs[i].left + collideObjs[i].width;
+	bottom = collideObjs[i].top + collideObjs[i].height;
+
+	if (curY >= top && curY <= bottom) {//if the current position is between the top and bottom of the rect
+		if (curX < left) { //if we're left of the object
+			side = "left";
+		} else {
+			side = "right";
+		}
+	} else if (curX >= left && curX <= right) {//if the current position is between the left and right
+		if (curY < top) { //if we're above the object
+			side = "top";
+		} else {
+			side = "bottom";
+		}
+	} else if (curX <= left && curY <= top) {//you are in the top left corner
+		//calulate the gradient to the top left corner
+		mc = (curY - top)/(left - curX);
+		if (m > mc) { //a gradient larger than the gradient to the corner will hit the top
+			side = "top";
+		} else {
+			side = "bottom";
+		}
+	} else if (curX >= right && curY <= top) {//top right corner
+		//calculate the gradient to the top right corner
+		mc = (curY - top)/(right - curX);
+		if (m < mc) { //a gradient smaller than mc will hit the top
+			side = "top";
+		} else {
+			side = "right";
+		}
+	} else if (curX <= left && curY >= bottom) {
+		//calculate the gradient to the bottom left corner
+		mc = (curY - bottom)/(left - curX);
+		if (m > mc) { // a steeper gradient will hit the left
+			side = "left";
+		} else {
+			side = "bottom";
+		}
+	} else if (curX >= right && curY >= bottom) {
+		//calculate the gradient to the bottom right corner
+		mc = (curY - bottom)/(right - curX);
+		if (m < mc) { //a more negative gradient will hit the right side
+			side = "right";
+		} else {
+			side = "bottom";
+		}
+	} else {
+		console.log("Missed something?")
+	}
+
+	/*//translate the dimension of the object to our local coordinate system
 	obtop = curY - obj.top;
 	bottom = curY - (obj.top + obj.height);
 	left = obj.left - curX;
@@ -962,6 +1015,7 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 	}
 	if (side == null) {
 		side = "beats me";
-	}
+	}*/
+	console.log(side);
 	return side;
 }
