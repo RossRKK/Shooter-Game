@@ -658,7 +658,7 @@ function gameLoop() {
 							closest = 30;
 							//find which side we collide with
 							if (collision.side == "left") {
-								if (player.top > obj.top) {
+								if (player.top < obj.top) {
 									//top left
 									obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
 								} else {
@@ -666,7 +666,7 @@ function gameLoop() {
 									obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
 								}
 							} else if (collision.side == "right") {
-								if (player.top > obj.top) {
+								if (player.top < obj.top) {
 									//top right
 									obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
 								} else {
@@ -935,7 +935,6 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 			side = "top";
 		}
 	}
-
 	/*if (m >= 0 && curX < tarX) {
 		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) { // this isn't right
 			side = "left";
@@ -969,6 +968,22 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 			side = "bottom";
 		} else {
 			side = "top";
+		}
+	}
+	if (side == null) {
+		side = "beats me";
+		//i don't know why this bit is needed but apparently it is (sometime we onlyintersect one side)
+		if (intersectsRight) {
+			side = "right"
+		}
+		if (intersectsLeft) {
+			side = "left";
+		}
+		if (intersectsTop) {
+			side = "top";
+		}
+		if (intersectsBottom) {
+			side = "bottom";
 		}
 	}
 	return side;
