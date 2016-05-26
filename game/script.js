@@ -656,6 +656,7 @@ function gameLoop() {
 					if(obj.setNewWay) { //prevent a new waypoint being set if we can't see the player
 						if (collision.obj != null) {
 							closest = 30;
+							console.log(collision.side)
 							//find which side we collide with
 							if (collision.side == "left") {
 								if (player.top < obj.top) {
@@ -892,10 +893,10 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 	iBottom = bottom/m;
 
 	//check if it actually intersects
-	intersectsRight = iRight > bottom && iRight < obtop;
-	intersectsLeft = iLeft > bottom && iLeft < obtop;
-	intersectsTop = iTop > left && iTop < right;
-	intersectsBottom = iBottom > left && iBottom < right;
+	intersectsRight = iRight >= bottom && iRight <= obtop;
+	intersectsLeft = iLeft >= bottom && iLeft <= obtop;
+	intersectsTop = iTop >= left && iTop <= right;
+	intersectsBottom = iBottom >= left && iBottom <= right;
 	//check which of the 3 possible ways to intersect a rectangle this is
 	if (intersectsLeft && intersectsTop) {
 		if (curY > tarY) {
@@ -911,7 +912,7 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 		}
 
 	} else if (intersectsTop && intersectsBottom) {
-		if (curY > tarY) {
+		if (curY >= tarY) {
 			side = "bottom";
 		} else {
 			side = "top";
@@ -935,33 +936,7 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 			side = "top";
 		}
 	}
-	/*if (m >= 0 && curX < tarX) {
-		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) { // this isn't right
-			side = "left";
-		} else if (collideObjs[i].width + collideObjs[i].left > curX && collideObjs[i].left < curX) {
-			side = "bottom";
-		}
 
-	} else if (m < 0 && curX < tarX) {
-		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
-			side = "left";
-		} else if (collideObjs[i].width + collideObjs[i].left > curX && collideObjs[i].left < curX) {
-			side = "top";
-		}
-	} else if (m >= 0 && curX > tarX) {
-		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
-			side = "right";
-		} else if (collideObjs[i].width + collideObjs[i].left > curX && collideObjs[i].left < curX) {
-			side = "top";
-		}
-
-	} else if (m < 0 && curX > tarX) {
-		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
-			side = "right";
-		} else if (collideObjs[i].width + collideObjs[i].left > curX && collideObjs[i].left < curX) {
-			side = "bottom";
-		}
-	}*/
 	//check m isn't NaN
 	if (!(m >= 0) && !(m < 0)) {
 		if (curY > collideObjs[i].height + collideObjs[i].top) {
@@ -971,7 +946,6 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 		}
 	}
 	if (side == null) {
-		side = "beats me";
 		//i don't know why this bit is needed but apparently it is (sometime we onlyintersect one side)
 		if (intersectsRight) {
 			side = "right"
@@ -985,6 +959,16 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 		if (intersectsBottom) {
 			side = "bottom";
 		}
+	}
+	if (side == null) {
+		side = "beats me";
+		console.log("Right: " + intersectsRight)
+
+		console.log("Left: " + intersectsLeft)
+
+		console.log("Top: " + intersectsTop)
+
+		console.log("Bottom: " + intersectsBottom)
 	}
 	return side;
 }
