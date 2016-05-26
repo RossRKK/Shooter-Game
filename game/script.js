@@ -635,7 +635,7 @@ function gameLoop() {
 			//calculate the angle from the enemy to the player
 			playerAngle = -Math.atan2((obj.left - obj.width/2) - player.left + player.width/2, (obj.top - obj.height/2) - player.top + player.height/2);
 			//do this as many times as the objects speed is
-			for (var i = 0; i < obj.speed; i++) {
+			//for (var i = 0; i < obj.speed; i++) {
 				collision = obstructedBy(obj.left + obj.width/2, obj.top + obj.height/2, player.left + player.width/2, player.top + player.height/2);
 				if (obj.patroling) {
 					obj.way = obj.pWays[obj.curWay];
@@ -711,7 +711,7 @@ function gameLoop() {
 				//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
 				obj.angle = -Math.atan2(obj.left - obj.way.x, obj.top - obj.way.y);
 				//move the object towards the waypoint
-				if (obj.left + obj.width/2 < obj.way.x) {
+				/*if (obj.left + obj.width/2 < obj.way.x) {
 					obj.left ++;
 				} else if (obj.left + obj.width/2 > obj.way.x) {
 					obj.left --;
@@ -720,7 +720,14 @@ function gameLoop() {
 					obj.top ++;
 				} else if (obj.top + obj.height/2 > obj.way.y) {
 					obj.top --;
-				}
+				}*/
+				//calculate how far up and along we need to go if we want to move excatly the objects speed
+				dy = -obj.speed * Math.cos(obj.angle);
+				dx = obj.speed * Math.sin(obj.angle);
+
+				obj.top += dy;
+				obj.left += dx;
+
 				//if the object has reached its way point
 				if (Math.round(obj.left + obj.width/2) == Math.round(obj.way.x) && Math.round(obj.top + obj.height/2) == Math.round(obj.way.y)) {
 					//if the patrol type is loop change to correct waypoint
@@ -729,7 +736,7 @@ function gameLoop() {
 					}
 					obj.setNewWay = true;
 				}
-			}
+			//}
 		}
 
 		//if the player is within the enemies view
