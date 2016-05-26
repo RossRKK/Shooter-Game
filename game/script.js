@@ -117,7 +117,7 @@ function init() {
 		//load the enemies array
 		enemies = level.enemies;
 		//add all enemies to the collideObjs array
-		collideObjs = collideObjs.concat(enemies);
+		//collideObjs = collideObjs.concat(enemies);
 
 		//load the consumables array
 		consumables = level.consumables;
@@ -629,7 +629,6 @@ function gameLoop() {
 			if (obj.health <= 0) {
 				enemies.splice(enemies.indexOf(obj), 1);
 				graphObjs.splice(graphObjs.indexOf(obj), 1);
-				collideObjs.splice(graphObjs.indexOf(obj), 1);
 			}
 			//calculate the distance from the enemy to the player
 			playerDist = Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2));
@@ -637,49 +636,104 @@ function gameLoop() {
 			playerAngle = -Math.atan2((obj.left - obj.width/2) - player.left + player.width/2, (obj.top - obj.height/2) - player.top + player.height/2);
 			//do this as many times as the objects speed is
 			for (var i = 0; i < obj.speed; i++) {
+				collision = obstructedBy(obj.left + obj.width/2, obj.top + obj.height/2, player.left + player.width/2, player.top + player.height/2);
 				if (obj.patroling) {
-					//move the object towards the waypoint
-					if (obj.left + obj.width/2 < obj.pWays[obj.curWay].x) {
-						obj.left ++;
-					} else if (obj.left + obj.width/2 > obj.pWays[obj.curWay].x) {
-						obj.left --;
-					}
-					if (obj.top + obj.height/2 < obj.pWays[obj.curWay].y) {
-						obj.top ++;
-					} else if (obj.top + obj.height/2 > obj.pWays[obj.curWay].y) {
-						obj.top --;
-					}
-					//if the object has reached its way point
-					if (Math.round(obj.left + obj.width/2) == Math.round(obj.pWays[obj.curWay].x) && Math.round(obj.top + obj.height/2) == Math.round(obj.pWays[obj.curWay].y)) {
-						//if the patrol type is loop change to correct waypoint
-						if(obj.pType == "loop") {
-							obj.curWay = (obj.curWay + 1) % obj.pWays.length;
-						}
-						//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
-						obj.angle = -Math.atan2(obj.left - obj.pWays[obj.curWay].x, obj.top - obj.pWays[obj.curWay].y);
-					}
+					obj.way = obj.pWays[obj.curWay];
 				} else {
-					//move the enemy towards the player if the enemey is further than 50px away
-					if (playerDist > 75) {
-						if (obj.left + obj.width/2 < player.left + player.width/2) {
-							obj.left ++;
-						} else if (obj.left + obj.width/2 > player.left + player.width/2) {
-							obj.left --;
-						}
-						if (obj.top + obj.height/2 < player.top + player.height/2) {
-							obj.top ++;
-						} else if (obj.top + obj.height/2 > player.top + player.height/2) {
-							obj.top --;
+					//prevent the enemy from colliding with the player
+					closest = 15;
+					if (obj.left > player.left) {
+						wayX = player.left + player.width + closest;
+					} else {
+						wayX = player.left - closest;
+					}
+					if (obj.top > player.top) {
+						wayY = player.top + player.height + closest;
+					} else {
+						wayY = player.top - closest;
+					}
+
+					if(obj.setNewWay) { //prevent a new waypoint being set if we can't see the player
+						if (collision.obj != null) {
+							closest = 30;
+							//find which side we collide with
+							if (collision.side == "left") {
+								if (player.top > obj.top) {
+									//top left
+									obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
+								} else {
+									//bottom left
+									obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
+								}
+							} else if (collision.side == "right") {
+								if (player.top > obj.top) {
+									//top right
+									obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
+								} else {
+									//bottom right
+									obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
+								}
+							} else if (collision.side == "top") {
+								if (player.left > obj.left) {
+									//top right
+									obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + closest};
+								} else {
+									//top left
+									obj.way = {x: collision.obj.left, y: collision.obj.top + closest};
+								}
+							} else if (collision.side == "bottom") {
+								if (player.left > obj.left) {
+									//bottom right
+									obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
+								} else {
+									//bottom left
+									obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
+								}
+							} else {
+								//somehow we have a collision but don't knwo what side its on, lets just move towards the player
+								obj.way = {
+									x: wayX,
+									y: wayY
+								}
+							}
+							obj.setNewWay = false;
+						} else {
+							//no collision move straight to the player
+							//move the enemy towards the player
+							obj.way = {
+								x: wayX,
+								y: wayY
+							}
+							obj.setNewWay = true;
 						}
 					}
-					//set enemy angle towards player
-					obj.angle = playerAngle;
+				}
+				//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
+				obj.angle = -Math.atan2(obj.left - obj.way.x, obj.top - obj.way.y);
+				//move the object towards the waypoint
+				if (obj.left + obj.width/2 < obj.way.x) {
+					obj.left ++;
+				} else if (obj.left + obj.width/2 > obj.way.x) {
+					obj.left --;
+				}
+				if (obj.top + obj.height/2 < obj.way.y) {
+					obj.top ++;
+				} else if (obj.top + obj.height/2 > obj.way.y) {
+					obj.top --;
+				}
+				//if the object has reached its way point
+				if (Math.round(obj.left + obj.width/2) == Math.round(obj.way.x) && Math.round(obj.top + obj.height/2) == Math.round(obj.way.y)) {
+					//if the patrol type is loop change to correct waypoint
+					if(obj.patroling && obj.pType == "loop") {
+						obj.curWay = (obj.curWay + 1) % obj.pWays.length;
+					}
+					obj.setNewWay = true;
 				}
 			}
 		}
 
 		//if the player is within the enemies view
-		if (playerDist < obj.range && playerAngle - obj.angle < obj.rangeAng) {
+		if (playerDist < obj.range && playerAngle - obj.angle < obj.rangeAng && collision.obj == null) {
 			obj.patroling = false;
 			if (iterator % obj.fireRate == 0) {
 				bullet = {
@@ -698,7 +752,8 @@ function gameLoop() {
 				bullets.push(bullet);
 			}
 		} else {
-			obj.patroling = true;
+			//obj.patroling = true;
+			//TODO: implement path finding here
 		}
 	});
 
@@ -707,6 +762,8 @@ function gameLoop() {
 	updatePos(consumables);
 	//move waypoints in enemiy objects objects
 	enemies.forEach(function (obj) {
+		obj.left += player.vx;
+		obj.top += player.vy;
 		obj.pWays.forEach(function (i) {
 			i.x += player.vx;
 			i.y += player.vy;
@@ -723,8 +780,8 @@ function updatePos(arr) {
 		//move objects
 		obj.left += player.vx;
 		obj.top += player.vy;
-		obj.left += player.x;
-		obj.top += player.y;
+		//obj.left += player.x;
+		//obj.top += player.y;
 	});
 }
 
