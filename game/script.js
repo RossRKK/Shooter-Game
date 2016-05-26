@@ -677,13 +677,14 @@ function gameLoop() {
 			obj.top += dy;
 			obj.left += dx;
 
+			wayDistance = Math.sqrt(Math.pow(obj.left + obj.width/2 - obj.way.x, 2) + Math.pow(obj.top + obj.height/2 - obj.way.y, 2));
 			//if the object has reached its way point
-			if (Math.round(obj.left + obj.width/2) == Math.round(obj.way.x) && Math.round(obj.top + obj.height/2) == Math.round(obj.way.y)) {
+			//if (Math.round(obj.left + obj.width/2) == Math.round(obj.way.x) && Math.round(obj.top + obj.height/2) == Math.round(obj.way.y)) {
+			if (wayDistance < 20) {
 				//if the patrol type is loop change to correct waypoint
 				if(obj.patroling && obj.pType == "loop") {
 					obj.curWay = (obj.curWay + 1) % obj.pWays.length;
 				}
-				obj.way = null;
 				obj.setNewWay = true;
 			}
 		}
