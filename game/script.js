@@ -668,19 +668,20 @@ function gameLoop() {
 				}
 			}
 			//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
-			obj.angle = -Math.atan2(obj.left - obj.way.x, obj.top - obj.way.y);
+			dirAngle = -Math.atan2(obj.left - obj.way.x, obj.top - obj.way.y);
+			obj.angle = dirAngle;
 			//move the object towards the waypoint
 			//calculate how far up and along we need to go if we want to move excatly the objects speed
-			dy = -obj.speed * Math.cos(obj.angle);
-			dx = obj.speed * Math.sin(obj.angle);
+			dy = -obj.speed * Math.cos(dirAngle);
+			dx = obj.speed * Math.sin(dirAngle);
 
 			obj.top += dy;
 			obj.left += dx;
 
 			wayDistance = Math.sqrt(Math.pow(obj.left + obj.width/2 - obj.way.x, 2) + Math.pow(obj.top + obj.height/2 - obj.way.y, 2));
 			//if the object has reached its way point
-			//if (Math.round(obj.left + obj.width/2) == Math.round(obj.way.x) && Math.round(obj.top + obj.height/2) == Math.round(obj.way.y)) {
 			if (wayDistance < 20) {
+				obj.angle = playerAngle;//prevent the enemy from flickering when it reaches the player
 				//if the patrol type is loop change to correct waypoint
 				if(obj.patroling && obj.pType == "loop") {
 					obj.curWay = (obj.curWay + 1) % obj.pWays.length;
@@ -891,39 +892,39 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 }
 
 function pathAroundObstacle(obj, collision) {
-closest = 100;
-//find which side we collide with
-if (collision.side == "left") {
-	if (player.top < obj.top) {
-		//top left
-		obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
-	} else {
-		//bottom left
-		obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
+	closest = 100;
+	//find which side we collide with
+	if (collision.side == "left") {
+		if (player.top < obj.top) {
+			//top left
+			obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
+		} else {
+			//bottom left
+			obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
+		}
+	} else if (collision.side == "right") {
+		if (player.top < obj.top) {
+			//top right
+			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
+		} else {
+			//bottom right
+			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
+		}
+	} else if (collision.side == "top") {
+		if (player.left > obj.left) {
+			//top right
+			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
+		} else {
+			//top left
+			obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
+		}
+	} else if (collision.side == "bottom") {
+		if (player.left > obj.left) {
+			//bottom right
+			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
+		} else {
+			//bottom left
+			obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
+		}
 	}
-} else if (collision.side == "right") {
-	if (player.top < obj.top) {
-		//top right
-		obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
-	} else {
-		//bottom right
-		obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
-	}
-} else if (collision.side == "top") {
-	if (player.left > obj.left) {
-		//top right
-		obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
-	} else {
-		//top left
-		obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
-	}
-} else if (collision.side == "bottom") {
-	if (player.left > obj.left) {
-		//bottom right
-		obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
-	} else {
-		//bottom left
-		obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
-	}
-}
 }
