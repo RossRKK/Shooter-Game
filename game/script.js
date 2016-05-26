@@ -578,8 +578,8 @@ function gameLoop() {
 	//collisions code
 	collideObjs.forEach(function (obj) {
 		if (obj.left + obj.width > player.left && obj.left < player.left + player.width && obj.top + obj.height > player.top && obj.top < player.top + player.height) {
-			player.vy += -player.vy;
-			player.vx += -player.vx;
+			player.vy += -player.vy - player.efficiency/200 * player.vy;
+			player.vx += -player.vx - player.efficiency/200 * player.vx;
 			if (player.left + player.width > obj.width + obj.left) {
 				player.x += player.left - (obj.left + obj.width);
 			}
@@ -726,4 +726,134 @@ function updatePos(arr) {
 		obj.left += player.x;
 		obj.top += player.y;
 	});
+}
+
+//function that finds an obstruction between the current position and the target position
+function obstructedBy(curX, curY, tarX, tarY) {
+	obj = null;
+	side = null;
+	step = 1;
+	//the y part is wrong because we measure from the top left not the bottom left
+	m = (curY - tarY)/(tarX - curX); //calculate the gradient of the line between the 2 positions
+	//loop through every x coordinate between the current x value and the target x value
+	//find out which way the target is
+	if (tarX > curX) {
+		for (i = 0; i < tarX - curX; i = i + step) {
+			x = curX + i; //calculate x value along the line
+			y = curY + m * i; //calculate y value along the line
+			for (j = 0; j < collideObjs.length; j++) {
+				//check if the coordinate is in the object
+				if (isColliding(x, y, j)) {
+					obj = collideObjs[j]; //return the first object in the way
+					side = getSide(curX, curY, tarX, tarY, j);
+					break;
+				}
+			}
+			if (obj != null) {
+					break;
+			}
+		}
+	} else if (tarX < curX) {
+		for (i = 0; i > tarX - curX; i = i - step) {
+			x = curX + i; //calculate x value along the line
+			y = curY + m * i; //calculate y value along the line
+			for (j = 0; j < collideObjs.length; j++) {
+				//check if the coordinate is in the object
+				if (isColliding(x, y, j)) {
+					obj = collideObjs[j]; //return the first object in the way
+					side = getSide(curX, curY, tarX, tarY, j);
+					break;
+				}
+			}
+			if (obj != null) {
+					break;
+			}
+		}
+	} else if (tarX == curX) {
+		if (tarY > curY) {
+			for (i = 0; i < tarY - curY; i = i + step) {
+				x = curX; //calculate x value along the line
+				y = curY + i; //calculate y value along the line
+				for (j = 0; j < collideObjs.length; j++) {
+					//check if the coordinate is in the object
+					if (isColliding(x, y, j)) {
+						obj = collideObjs[j]; //return the first object in the way
+						side = getSide(curX, curY, tarX, tarY, j);
+						break;
+					}
+				}
+				if (obj != null) {
+					break;
+				}
+			}
+		} else if (tarY < curY) {
+			for (i = 0; i < curY - tarY; i = i + step) {
+				x = curX; //calculate x value along the line
+				y = curY - i; //calculate y value along the line
+				for (j = 0; j < collideObjs.length; j++) {
+					//check if the coordinate is in the object
+					if (isColliding(x, y, j)) {
+						obj = collideObjs[j]; //return the first object in the way
+						side = getSide(curX, curY, tarX, tarY, j);
+						break;
+					}
+				}
+				if (obj != null) {
+					break;
+				}
+			}
+		}
+	}
+	retr = {
+		obj: obj,
+		side: side
+	}
+	return retr;
+}
+
+//find if a coordinate is inside a collideObj
+function isColliding(x, y, i) {
+	return collideObjs[i].left <= x && collideObjs[i].left + collideObjs[i].width >= x && collideObjs[i].top <= y && collideObjs[i].top + collideObjs[i].height >= y;
+}
+
+//returns the side of the collide obj hit if you where to travel from the current position to the target
+function getSide(curX, curY, tarX, tarY, i) {
+	m = (curY - tarY)/(tarX - curX); //calculate the gradient of the line between the 2 positions
+
+	if (m >= 0 && curX < tarX) {
+		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
+			side = "left";
+		} else if (collideObjs[i].width + collideObjs[i].left > curY && collideObjs[i].left < curY) {
+			side = "bottom";
+		}
+
+	} else if (m < 0 && curX < tarX) {
+		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
+			side = "left";
+		} else if (collideObjs[i].width + collideObjs[i].left > curY && collideObjs[i].left < curY) {
+			side = "top";
+		}
+	} else if (m >= 0 && curX > tarX) {
+		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
+			side = "right";
+		} else if (collideObjs[i].width + collideObjs[i].left > curY && collideObjs[i].left < curY) {
+			side = "top";
+		}
+
+	} else if (m < 0 && curX > tarX) {
+		if (collideObjs[i].height + collideObjs[i].top > curY && collideObjs[i].height < curY) {
+			side = "right";
+		} else if (collideObjs[i].width + collideObjs[i].left > curY && collideObjs[i].left < curY) {
+			side = "bottom";
+		}
+	} else 
+	//check m isn't NaN
+	if (!(m >= 0 && m < 0)) {
+		if (curY > collideObjs[i].height + collideObjs[i].top) {
+			side = "bottom";
+		} else {
+			side = "top";
+		}
+	}
+	return side;
 }
