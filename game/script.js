@@ -652,11 +652,9 @@ function gameLoop() {
 					} else {
 						wayY = player.top - closest;
 					}
-
 					if(obj.setNewWay) { //prevent a new waypoint being set if we can't see the player
 						if (collision.obj != null) {
 							closest = 30;
-							console.log(collision.side)
 							//find which side we collide with
 							if (collision.side == "left") {
 								if (player.top < obj.top) {
@@ -892,7 +890,7 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 	iTop = top/m;
 	iBottom = bottom/m;
 
-	//check if it actually intersects
+	//check if it actually intersects#
 	intersectsRight = iRight >= bottom && iRight <= obtop;
 	intersectsLeft = iLeft >= bottom && iLeft <= obtop;
 	intersectsTop = iTop >= left && iTop <= right;
@@ -945,8 +943,10 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 			side = "top";
 		}
 	}
+
+	//i do not knwo why any of this bit would ever need to be used but soemtimes we intersect 1 or no sides apparently
 	if (side == null) {
-		//i don't know why this bit is needed but apparently it is (sometime we onlyintersect one side)
+		//i don't know why this bit is needed but apparently it is (sometimes we onlyintersect one side)
 		if (intersectsRight) {
 			side = "right"
 		}
@@ -962,13 +962,6 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 	}
 	if (side == null) {
 		side = "beats me";
-		console.log("Right: " + intersectsRight)
-
-		console.log("Left: " + intersectsLeft)
-
-		console.log("Top: " + intersectsTop)
-
-		console.log("Bottom: " + intersectsBottom)
 	}
 	return side;
 }
