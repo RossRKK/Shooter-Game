@@ -654,7 +654,7 @@ function gameLoop() {
 					}
 					if(obj.setNewWay) { //prevent a new waypoint being set if we can't see the player
 						if (collision.obj != null) {
-							closest = 100;
+							closest = 50;
 							//find which side we collide with
 							if (collision.side == "left") {
 								if (player.top < obj.top) {
@@ -675,10 +675,10 @@ function gameLoop() {
 							} else if (collision.side == "top") {
 								if (player.left > obj.left) {
 									//top right
-									obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + closest};
+									obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
 								} else {
 									//top left
-									obj.way = {x: collision.obj.left, y: collision.obj.top + closest};
+									obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
 								}
 							} else if (collision.side == "bottom") {
 								if (player.left > obj.left) {
@@ -689,13 +689,14 @@ function gameLoop() {
 									obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
 								}
 							} else {
-								//somehow we have a collision but don't knwo what side its on, lets just move towards the player
-								obj.way = {
-									x: wayX,
-									y: wayY
-								}
+								//somehow we have a collision but don't knwo what side its on, lets set a new waypoint next time
+								/*obj.way = {
+									x: obj.left,
+									y: obj.top
+								}*/
+								obj.setNewWay = false;
 							}
-							obj.setNewWay = false;
+							obj.setNewWay = !obj.setNewWay; //hackiness
 						} else {
 							//no collision move straight to the player
 							//move the enemy towards the player
@@ -928,8 +929,6 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 		} else {
 			side = "bottom";
 		}
-	} else {
-		console.log("Missed something?")
 	}
 
 	/*//translate the dimension of the object to our local coordinate system
@@ -1016,6 +1015,5 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 	if (side == null) {
 		side = "beats me";
 	}*/
-	console.log(side);
 	return side;
 }
