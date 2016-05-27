@@ -637,7 +637,18 @@ function gameLoop() {
 
 			collision = obstructedBy(obj.left + obj.width/2, obj.top + obj.height/2, player.left + player.width/2, player.top + player.height/2);
 			if (obj.patroling) {
-				obj.way = obj.pWays[obj.curWay];
+				if (obj.setNewWay) {
+					//test if there is a collision between our positiion and the current patrol waypoint
+					collision = obstructedBy(obj.left + obj.width/2, obj.top + obj.height/2, obj.pWays[obj.curWay].x, obj.pWays[obj.curWay].y);
+					if (collision.obj != null) {
+						//navigate around obstacles
+						pathAroundObstacle(obj, collision, obj.pWays[obj.curWay].x, obj.pWays[obj.curWay].y);
+					} else {
+						//head to waypoint
+						obj.way = obj.pWays[obj.curWay];
+					}
+					obj.setNewWay = false;
+				}
 			} else {
 				//prevent the enemy from colliding with the player
 				closest = 15;
@@ -654,8 +665,10 @@ function gameLoop() {
 				if(obj.setNewWay) { //prevent a new waypoint being set if we can't see the player
 					if (collision.obj != null) {
 						//path around obstacle
-						pathAroundObstacle(obj, collision);
+						pathAroundObstacle(obj, collision, player.left, player.top);
+						obj.canSeePlayer = false;
 						obj.setNewWay = false;
+						console.log(collision.side);
 					} else {
 						//no collision move straight to the player
 						//move the enemy towards the player
@@ -663,6 +676,7 @@ function gameLoop() {
 							x: wayX,
 							y: wayY
 						}
+						obj.canSeePlayer = true;
 						obj.setNewWay = true;
 					}
 				}
@@ -686,12 +700,19 @@ function gameLoop() {
 				if(obj.patroling && obj.pType == "loop") {
 					obj.curWay = (obj.curWay + 1) % obj.pWays.length;
 				}
+				//if you reach a waypoint and can't see the player return to your patrol, if you can chase them
+				if (obj.canSeePlayer) {
+					obj.patroling = false;
+				} else {
+					obj.patroling = true;
+				}
 				obj.setNewWay = true;
 			}
 		}
 
 		//if the player is within the enemies view
 		if (playerDist < obj.range && playerAngle - obj.angle < obj.rangeAng && collision.obj == null) {
+			obj.canSeePlayer = true;
 			obj.patroling = false;
 			if (iterator % obj.fireRate == 0) {
 				bullet = {
@@ -709,9 +730,6 @@ function gameLoop() {
 				}
 				bullets.push(bullet);
 			}
-		} else {
-			//obj.patroling = true;
-			//TODO: implement path finding here
 		}
 	});
 
@@ -891,11 +909,11 @@ function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it w
 	return side;
 }
 
-function pathAroundObstacle(obj, collision) {
+function pathAroundObstacle(obj, collision, tarX, tarY) {
 	closest = 100;
 	//find which side we collide with
 	if (collision.side == "left") {
-		if (player.top < obj.top) {
+		if (tarY < obj.top) {
 			//top left
 			obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
 		} else {
@@ -903,7 +921,7 @@ function pathAroundObstacle(obj, collision) {
 			obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
 		}
 	} else if (collision.side == "right") {
-		if (player.top < obj.top) {
+		if (tarY < obj.top) {
 			//top right
 			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
 		} else {
@@ -911,7 +929,7 @@ function pathAroundObstacle(obj, collision) {
 			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
 		}
 	} else if (collision.side == "top") {
-		if (player.left > obj.left) {
+		if (tarX > obj.left) {
 			//top right
 			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
 		} else {
@@ -919,7 +937,7 @@ function pathAroundObstacle(obj, collision) {
 			obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
 		}
 	} else if (collision.side == "bottom") {
-		if (player.left > obj.left) {
+		if (tarX > obj.left) {
 			//bottom right
 			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
 		} else {
