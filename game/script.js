@@ -36,14 +36,11 @@ var rightBar;
 var bottomBar;
 var player;
 
-//the players hitbox
-var hitbox;
-
-//declaration of collidable objects
-var test;
-var test2;
+//the players player
+var player;
 
 function loadImg(obj) {
+	obj.img = new Image();
 	obj.img.src = obj.source;
 	obj.img.onload = function () {
 		obj.loaded = true;
@@ -114,20 +111,13 @@ function init() {
 		collideObjs = level.collideObjs;
 		//add collideobjs to graphobjs array
 		level.collideObjs.forEach(function (obj){
-			if (obj.type == "img") {
-				obj.img = new Image();
-				obj.img.src = obj.source;
-				obj.img.onload = function () {
-					obj.loaded = true;
-				}
-			}
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
 		});
 
 		//load the enemies array
 		enemies = level.enemies;
 		//add all enemies to the collideObjs array
-		collideObjs = collideObjs.concat(enemies);
+		//collideObjs = collideObjs.concat(enemies);
 
 		//load the consumables array
 		consumables = level.consumables;
@@ -141,17 +131,6 @@ function init() {
 		level.enemies.forEach(function (obj){
 			graphObjs.splice(graphObjs.indexOf(gameWin) + 1, 0, obj);
 		});
-
-		enemies.forEach(function (obj) {
-			if (obj.type == "img") {
-				obj.img = new Image();
-				obj.img.src = obj.source;
-				obj.img.onload = function () {
-					obj.loaded = true;
-				}
-			}
-		});
-
 
 		title = {
 			type: "text",
@@ -168,19 +147,13 @@ function init() {
 	//player icon
 	player = {
 		type: "img",
-		top: gameWin.top + (gameWin.height/2),
-		left: gameWin.left + (gameWin.width/2),
+		top: gameWin.top + gameWin.height/2 - 10,
+		left: gameWin.left + gameWin.width/2 - 10,
 		width: 20,
 		height: 20,
-		source: "player.png",
+		source: "textures/player.png",
 		img: new Image(),
 		loaded: false,
-		load: function () {
-			player.img.src = player.source;
-			player.img.onload = function () {
-				player.loaded = true;
-			}
-		},
 		angle: Math.PI,
 		vx: 0,
 		vy: 0,
@@ -195,8 +168,8 @@ function init() {
 				colour: "#555555",
 				x: player.left,
 				y: player.top,
-				orgX: player.left,
-				orgY: player.top,
+				orgX: player.left + player.width/2,
+				orgY: player.top + player.height/2,
 				speed: 5
 			}
 			if (player.ammo > 0) {;
@@ -213,17 +186,11 @@ function init() {
 		efficiency: 100,
 		weight: 100,
 		normalizedX: 0,
-		normalizedY: 0
+		normalizedY: 0,
+		x: 0,
+		y: 0
 	}
 	graphObjs.push(player);
-
-	//declaring the dimensions of the players hit box
-	hitbox = {
-		top: player.top - 5,
-		left: player.left - 5,
-		bottom: player.top + player.height - 15,
-		right: player.left + player.width - 15
-	}
 
 	//status bars
 	//health bar
@@ -313,8 +280,8 @@ function init() {
 
 	gunIcon = {
 		type: "img",
-		top: gameWin.top + gameWin.height + 40,
-		left: rightBar.left + rightBar.width/2,
+		top: gameWin.top + gameWin.height,
+		left: rightBar.left + rightBar.width/2 - 32,
 		width: 64,
 		height: 64,
 		source: "textures/guns/pistol.png",
@@ -441,17 +408,17 @@ function render() {
 				ctx.fillRect(obj.left, obj.top, obj.width, obj.height);
 			} else if (obj.type == "img") {
 				if (!obj.loaded) {
-					obj.load();
+					loadImg(obj);
 				}
 				if (obj.loaded) {
 					//save the unmidified canvas
 					ctx.save();
 					//translate the canvas to the objects position
-					ctx.translate(obj.left, obj.top);
+					ctx.translate(obj.left + obj.width/2, obj.top + obj.height/2);
 					//roatate the object at the correct angle
 					ctx.rotate(obj.angle);
 					//draw the player icon
-					ctx.drawImage(obj.img, - obj.width/2, - obj.height/2, obj.width, obj.height);
+					ctx.drawImage(obj.img, -obj.width/2, -obj.height/2, obj.width, obj.height);
 					//restore the canavs to its original state
 					ctx.restore();
 				}
@@ -521,6 +488,8 @@ function updateStats() {
 var iterator = 0;
 //the main game loop
 function gameLoop() {
+	player.x = 0;
+	player.y = 0;
 	window.requestAnimationFrame(gameLoop);
 	//calculate the angle that the player should face
 	if ('ontouchstart' in window || navigator.msMaxTouchPointst) { //if touch screen
@@ -556,7 +525,7 @@ function gameLoop() {
 		player.vx -= player.speed;
 	}
 	//drain charge if the player is moving
-	if((w || a || s || d) && player.charge > 0) {
+	if((player.vy > 0 || player.vx > 0) && player.charge > 0) {
 		player.charge -= 1/player.efficiency;
 	}
 
@@ -600,7 +569,7 @@ function gameLoop() {
 		});
 
 		//damge the player if hit by a bullet
-		if (obj.x > hitbox.left && obj.x < hitbox.right && obj.y > hitbox.top && obj.y < hitbox.bottom) {
+		if (obj.x > player.left && obj.x < player.left + player.width && obj.y > player.top && obj.y < player.top + player.height) {
 			bullets.splice(bullets.indexOf(obj), 1);
 			player.health -= 10;
 		}
@@ -608,15 +577,27 @@ function gameLoop() {
 
 	//collisions code
 	collideObjs.forEach(function (obj) {
-		if (obj.left + obj.width > hitbox.left && obj.left < hitbox.right && obj.top + obj.height > hitbox.top && obj.top < hitbox.bottom) {
-			player.vy = -player.vy;
-			player.vx = -player.vx;
+		if (obj.left + obj.width > player.left && obj.left < player.left + player.width && obj.top + obj.height > player.top && obj.top < player.top + player.height) {
+			player.vy += -player.vy - player.efficiency/200 * player.vy;
+			player.vx += -player.vx - player.efficiency/200 * player.vx;
+			if (player.left + player.width > obj.width + obj.left) {
+				player.x += player.left - (obj.left + obj.width);
+			}
+			if (player.left < obj.left) {
+				player.x += player.left - (obj.left - player.width);
+			}
+			if (player.top + player.height > obj.height + obj.top) {
+				player.y += player.top - (obj.top + obj.height);
+			}
+			if (player.top < obj.top) {
+				player.y += player.top - (obj.top - player.height);
+			}
 		}
 	});
 
 	//consumables collisions
 	consumables.forEach(function (obj) {
-		if (obj.left + obj.width > hitbox.left && obj.left < hitbox.right && obj.top + obj.height > hitbox.top && obj.top < hitbox.bottom) {
+		if (obj.left + obj.width > player.left && obj.left < player.left + player.width && obj.top + obj.height > player.top && obj.top < player.top + player.height) {
 			if (obj.resource == "health") {
 				player.health += obj.supply;
 				if (player.health > player.maxHealth) {
@@ -625,17 +606,24 @@ function gameLoop() {
 				consumables.splice(consumables.indexOf(obj), 1);
 				graphObjs.splice(graphObjs.indexOf(obj), 1);
 			} else if (obj.resource == "charge") {
-				player.charge += supply;
+				player.charge += obj.supply;
 				if (player.charge > player.maxCharge) {
 					player.charge = player.maxCharge;
 				}
 				consumables.splice(consumables.indexOf(obj), 1);
 				graphObjs.splice(graphObjs.indexOf(obj), 1);
-			}
+			} else if (obj.resource == "ammo") {
+				player.ammo += obj.supply;
+				if (player.ammo > player.maxAmmo) {
+					player.ammo = player.maxAmmo;
+				}
+				consumables.splice(consumables.indexOf(obj), 1);
+				graphObjs.splice(graphObjs.indexOf(obj), 1);
+			} 
 		}
 	});
 
-	//enemy patrols
+	//enemy patrols (essetnially everything that the enemies do)
 	enemies.forEach(function (obj) {
 		if (obj.pType != null) {
 			if (obj.health <= 0) {
@@ -646,51 +634,84 @@ function gameLoop() {
 			playerDist = Math.sqrt(Math.pow(player.top + player.height/2 - obj.top + obj.height/2, 2) + Math.pow(player.left + player.width/2 - obj.left + obj.width/2, 2));
 			//calculate the angle from the enemy to the player
 			playerAngle = -Math.atan2((obj.left - obj.width/2) - player.left + player.width/2, (obj.top - obj.height/2) - player.top + player.height/2);
-			//do this as many times as the objects speed is
-			for (var i = 0; i < obj.speed; i++) {
-				if (obj.patroling) {
-					//move the object towards the waypoint
-					if (obj.left + obj.width/2 < obj.pWays[obj.curWay].x) {
-						obj.left ++;
-					} else if (obj.left + obj.width/2 > obj.pWays[obj.curWay].x) {
-						obj.left --;
+
+			collision = obstructedBy(obj.left + obj.width/2, obj.top + obj.height/2, player.left + player.width/2, player.top + player.height/2);
+			if (obj.patroling) {
+				if (obj.setNewWay) {
+					//test if there is a collision between our positiion and the current patrol waypoint
+					collision = obstructedBy(obj.left + obj.width/2, obj.top + obj.height/2, obj.pWays[obj.curWay].x, obj.pWays[obj.curWay].y);
+					if (collision.obj != null) {
+						//navigate around obstacles
+						pathAroundObstacle(obj, collision, obj.pWays[obj.curWay].x, obj.pWays[obj.curWay].y);
+					} else {
+						//head to waypoint
+						obj.way = obj.pWays[obj.curWay];
 					}
-					if (obj.top + obj.height/2 < obj.pWays[obj.curWay].y) {
-						obj.top ++;
-					} else if (obj.top + obj.height/2 > obj.pWays[obj.curWay].y) {
-						obj.top --;
-					}
-					//if the object has reached its way point
-					if (Math.round(obj.left + obj.width/2) == Math.round(obj.pWays[obj.curWay].x) && Math.round(obj.top + obj.height/2) == Math.round(obj.pWays[obj.curWay].y)) {
-						//if the patrol type is loop change to correct waypoint
-						if(obj.pType == "loop") {
-							obj.curWay = (obj.curWay + 1) % obj.pWays.length;
-						}
-						//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
-						obj.angle = -Math.atan2(obj.left - obj.pWays[obj.curWay].x, obj.top - obj.pWays[obj.curWay].y);
-					}
-				} else {
-					//move the enemy towards the player if the enemey is further than 50px away
-					if (playerDist > 75) {
-						if (obj.left + obj.width/2 < player.left + player.width/2) {
-							obj.left ++;
-						} else if (obj.left + obj.width/2 > player.left + player.width/2) {
-							obj.left --;
-						}
-						if (obj.top + obj.height/2 < player.top + player.height/2) {
-							obj.top ++;
-						} else if (obj.top + obj.height/2 > player.top + player.height/2) {
-							obj.top --;
-						}
-					}
-					//set enemy angle towards player
-					obj.angle = playerAngle;
+					obj.setNewWay = false;
 				}
+			} else {
+				//prevent the enemy from colliding with the player
+				closest = 15;
+				if (obj.left > player.left) {
+					wayX = player.left + player.width + closest;
+				} else {
+					wayX = player.left - closest;
+				}
+				if (obj.top > player.top) {
+					wayY = player.top + player.height + closest;
+				} else {
+					wayY = player.top - closest;
+				}
+				if(obj.setNewWay) { //prevent a new waypoint being set if we can't see the player
+					if (collision.obj != null) {
+						//path around obstacle
+						pathAroundObstacle(obj, collision, player.left, player.top);
+						obj.canSeePlayer = false;
+						obj.setNewWay = false;
+					} else {
+						//no collision move straight to the player
+						//move the enemy towards the player
+						obj.way = {
+							x: wayX,
+							y: wayY
+						}
+						obj.canSeePlayer = true;
+						obj.setNewWay = true;
+					}
+				}
+			}
+			//get the new angle the enemy points (exactly the same as the way we get the direction the player points)
+			dirAngle = -Math.atan2(obj.left - obj.way.x, obj.top - obj.way.y);
+			obj.angle = dirAngle;
+			//move the object towards the waypoint
+			//calculate how far up and along we need to go if we want to move excatly the objects speed
+			dy = -obj.speed * Math.cos(dirAngle);
+			dx = obj.speed * Math.sin(dirAngle);
+
+			obj.top += dy;
+			obj.left += dx;
+
+			wayDistance = Math.sqrt(Math.pow(obj.left + obj.width/2 - obj.way.x, 2) + Math.pow(obj.top + obj.height/2 - obj.way.y, 2));
+			//if the object has reached its way point
+			if (wayDistance < 20) {
+				obj.angle = playerAngle;//prevent the enemy from flickering when it reaches the player
+				//if the patrol type is loop change to correct waypoint
+				if(obj.patroling && obj.pType == "loop") {
+					obj.curWay = (obj.curWay + 1) % obj.pWays.length;
+				}
+				//if you reach a waypoint and can't see the player return to your patrol, if you can chase them
+				if (obj.canSeePlayer) {
+					obj.patroling = false;
+				} else {
+					obj.patroling = true;
+				}
+				obj.setNewWay = true;
 			}
 		}
 
 		//if the player is within the enemies view
-		if (playerDist < obj.range && playerAngle - obj.angle < obj.rangeAng) {
+		if (playerDist < obj.range && playerAngle - obj.angle < obj.rangeAng && collision.obj == null) {
+			obj.canSeePlayer = true;
 			obj.patroling = false;
 			if (iterator % obj.fireRate == 0) {
 				bullet = {
@@ -702,14 +723,12 @@ function gameLoop() {
 					colour: "#555555",
 					x: obj.left,
 					y: obj.top,
-					orgX: obj.left,
-					orgY: obj.top,
+					orgX: obj.left + obj.width/2,
+					orgY: obj.top + obj.height/2,
 					speed: 5
 				}
 				bullets.push(bullet);
 			}
-		} else {
-			obj.patroling = true;
 		}
 	});
 
@@ -718,6 +737,10 @@ function gameLoop() {
 	updatePos(consumables);
 	//move waypoints in enemiy objects objects
 	enemies.forEach(function (obj) {
+		obj.left += player.vx;
+		obj.top += player.vy;
+		obj.way.x += player.vx;
+		obj.way.y += player.vy;
 		obj.pWays.forEach(function (i) {
 			i.x += player.vx;
 			i.y += player.vy;
@@ -734,5 +757,191 @@ function updatePos(arr) {
 		//move objects
 		obj.left += player.vx;
 		obj.top += player.vy;
+		//obj.left += player.x;
+		//obj.top += player.y;
 	});
+}
+
+//function that finds an obstruction between the current position and the target position
+function obstructedBy(curX, curY, tarX, tarY) {
+	obj = null;
+	side = null;
+	step = 1;
+	//the y part is wrong because we measure from the top left not the bottom left
+	m = (tarY - curY)/(tarX - curX); //calculate the gradient of the line between the 2 positions
+	//loop through every x coordinate between the current x value and the target x value
+	//find out which way the target is
+	if (tarX > curX) {
+		for (i = 0; i < tarX - curX; i = i + step) {
+			x = curX + i; //calculate x value along the line
+			y = curY + m * i; //calculate y value along the line
+			for (j = 0; j < collideObjs.length; j++) {
+				//check if the coordinate is in the object
+				if (isColliding(x, y, j)) {
+					obj = collideObjs[j]; //return the first object in the way
+					side = getSide(curX, curY, tarX, tarY, j);
+					break;
+				}
+			}
+			if (obj != null) {
+					break;
+			}
+		}
+	} else if (tarX < curX) {
+		for (i = 0; i > tarX - curX; i = i - step) {
+			x = curX + i; //calculate x value along the line
+			y = curY + m * i; //calculate y value along the line
+			for (j = 0; j < collideObjs.length; j++) {
+				//check if the coordinate is in the object
+				if (isColliding(x, y, j)) {
+					obj = collideObjs[j]; //return the first object in the way
+					side = getSide(curX, curY, tarX, tarY, j);
+					break;
+				}
+			}
+			if (obj != null) {
+					break;
+			}
+		}
+	} else if (tarX == curX) {
+		if (tarY > curY) {
+			for (i = 0; i < tarY - curY; i = i + step) {
+				x = curX; //calculate x value along the line
+				y = curY + i; //calculate y value along the line
+				for (j = 0; j < collideObjs.length; j++) {
+					//check if the coordinate is in the object
+					if (isColliding(x, y, j)) {
+						obj = collideObjs[j]; //return the first object in the way
+						side = getSide(curX, curY, tarX, tarY, j);
+						break;
+					}
+				}
+				if (obj != null) {
+					break;
+				}
+			}
+		} else if (tarY < curY) {
+			for (i = 0; i < curY - tarY; i = i + step) {
+				x = curX; //calculate x value along the line
+				y = curY - i; //calculate y value along the line
+				for (j = 0; j < collideObjs.length; j++) {
+					//check if the coordinate is in the object
+					if (isColliding(x, y, j)) {
+						obj = collideObjs[j]; //return the first object in the way
+						side = getSide(curX, curY, tarX, tarY, j);
+						break;
+					}
+				}
+				if (obj != null) {
+					break;
+				}
+			}
+		}
+	}
+	retr = {
+		obj: obj,
+		side: side
+	}
+	return retr;
+}
+
+//find if a coordinate is inside a collideObj
+function isColliding(x, y, i) {
+	return collideObjs[i].left <= x && collideObjs[i].left + collideObjs[i].width >= x && collideObjs[i].top <= y && collideObjs[i].top + collideObjs[i].height >= y;
+}
+
+//returns the side of the collide obj hit if you where to travel from the current position to the target
+function getSide(curX, curY, tarX, tarY, i) { //as it stands this works but it will only work properly on a square
+	//imagine the line drawn on a graph where the current position is the origin
+	m = (curY - tarY)/(tarX - curX); //calculate the gradient of the line between the 2 positions
+
+	obtop = collideObjs[i].top;
+	left = collideObjs[i].left;
+	right = collideObjs[i].left + collideObjs[i].width;
+	bottom = collideObjs[i].top + collideObjs[i].height;
+
+	if (curY >= obtop && curY <= bottom) {//if the current position is between the top and bottom of the rect
+		if (curX < left) { //if we're left of the object
+			side = "left";
+		} else {
+			side = "right";
+		}
+	} else if (curX >= left && curX <= right) {//if the current position is between the left and right
+		if (curY < obtop) { //if we're above the object
+			side = "top";
+		} else {
+			side = "bottom";
+		}
+	} else if (curX <= left && curY <= obtop) {//you are in the top left corner
+		//calulate the gradient to the top left corner
+		mc = (curY - obtop)/(left - curX);
+		if (m > mc) { //a gradient larger than the gradient to the corner will hit the top
+			side = "top";
+		} else {
+			side = "bottom";
+		}
+	} else if (curX >= right && curY <= obtop) {//top right corner
+		//calculate the gradient to the top right corner
+		mc = (curY - obtop)/(right - curX);
+		if (m < mc) { //a gradient smaller than mc will hit the top
+			side = "top";
+		} else {
+			side = "right";
+		}
+	} else if (curX <= left && curY >= bottom) {
+		//calculate the gradient to the bottom left corner
+		mc = (curY - bottom)/(left - curX);
+		if (m > mc) { // a steeper gradient will hit the left
+			side = "left";
+		} else {
+			side = "bottom";
+		}
+	} else if (curX >= right && curY >= bottom) {
+		//calculate the gradient to the bottom right corner
+		mc = (curY - bottom)/(right - curX);
+		if (m < mc) { //a more negative gradient will hit the right side
+			side = "right";
+		} else {
+			side = "bottom";
+		}
+	}
+	return side;
+}
+
+function pathAroundObstacle(obj, collision, tarX, tarY) {
+	closest = 100;
+	//find which side we collide with
+	if (collision.side == "left") {
+		if (tarY < obj.top) {
+			//top left
+			obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
+		} else {
+			//bottom left
+			obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
+		}
+	} else if (collision.side == "right") {
+		if (tarY < obj.top) {
+			//top right
+			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
+		} else {
+			//bottom right
+			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
+		}
+	} else if (collision.side == "top") {
+		if (tarX > obj.left) {
+			//top right
+			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top - closest};
+		} else {
+			//top left
+			obj.way = {x: collision.obj.left, y: collision.obj.top - closest};
+		}
+	} else if (collision.side == "bottom") {
+		if (tarX > obj.left) {
+			//bottom right
+			obj.way = {x: collision.obj.left + collision.obj.width, y: collision.obj.top + collision.obj.height + closest};
+		} else {
+			//bottom left
+			obj.way = {x: collision.obj.left, y: collision.obj.top + collision.obj.height + closest};
+		}
+	}
 }
