@@ -668,7 +668,6 @@ function gameLoop() {
 						pathAroundObstacle(obj, collision, player.left, player.top);
 						obj.canSeePlayer = false;
 						obj.setNewWay = false;
-						console.log(collision.side);
 					} else {
 						//no collision move straight to the player
 						//move the enemy towards the player
@@ -769,7 +768,7 @@ function obstructedBy(curX, curY, tarX, tarY) {
 	side = null;
 	step = 1;
 	//the y part is wrong because we measure from the top left not the bottom left
-	m = (curY - tarY)/(tarX - curX); //calculate the gradient of the line between the 2 positions
+	m = (tarY - curY)/(tarX - curX); //calculate the gradient of the line between the 2 positions
 	//loop through every x coordinate between the current x value and the target x value
 	//find out which way the target is
 	if (tarX > curX) {
